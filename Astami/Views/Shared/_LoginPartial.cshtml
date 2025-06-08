@@ -2,25 +2,67 @@
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
 
-<ul class="navbar-nav">
 @if (SignInManager.IsSignedIn(User))
 {
-    <li class="nav-item">
-        <a  class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @User.Identity?.Name!</a>
-    </li>
-    <li class="nav-item">
-        <form  class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
-            <button  type="submit" class="nav-link btn btn-link text-dark">Logout</button>
-        </form>
-    </li>
+    <!-- User Menu quando è loggato -->
+    <div class="dropdown dropdown-end">
+        <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
+            <div class="w-10 rounded-full bg-primary text-primary-content flex items-center justify-center">
+                <i class="fas fa-user"></i>
+            </div>
+        </div>
+        <ul tabindex="0" class="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow-lg border">
+            <li class="menu-title">
+                <span>Ciao, @(User.Identity?.Name ?? "Utente")!</span>
+            </li>
+            <li>
+                <a asp-area="Identity" asp-page="/Account/Manage/Index" class="font-medium">
+                    <i class="fas fa-user-cog mr-2"></i>
+                    Il Mio Profilo
+                </a>
+            </li>
+            <li>
+                <a href="#" class="font-medium">
+                    <i class="fas fa-heart mr-2"></i>
+                    Preferiti
+                </a>
+            </li>
+            <li>
+                <a href="#" class="font-medium">
+                    <i class="fas fa-history mr-2"></i>
+                    Le Mie Aste
+                </a>
+            </li>
+            <li>
+                <a href="#" class="font-medium">
+                    <i class="fas fa-bell mr-2"></i>
+                    Notifiche
+                    <div class="badge badge-primary badge-sm">3</div>
+                </a>
+            </li>
+            <div class="divider my-1"></div>
+            <li>
+                <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" method="post" class="w-full">
+                    <button type="submit" class="w-full text-left font-medium text-error hover:bg-error/10">
+                        <i class="fas fa-sign-out-alt mr-2"></i>
+                        Logout
+                    </button>
+                </form>
+            </li>
+        </ul>
+    </div>
 }
 else
 {
-    <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Register</a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">Login</a>
-    </li>
+    <!-- Auth buttons quando non è loggato -->
+    <div class="flex gap-2">
+        <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-ghost font-medium">
+            <i class="fas fa-sign-in-alt mr-2"></i>
+            Accedi
+        </a>
+        <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-primary font-medium">
+            <i class="fas fa-user-plus mr-2"></i>
+            Registrati
+        </a>
+    </div>
 }
-</ul>

@@ -1,66 +1,195 @@
 ﻿@page
 @model RegisterModel
 @{
-    ViewData["Title"] = "Register";
+    ViewData["Title"] = "Crea il tuo account";
 }
 
-<h1>@ViewData["Title"]</h1>
+<div class="min-h-screen flex items-center justify-center bg-base-200 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-md w-full space-y-8">
+        <!-- Header -->
+        <div class="text-center">
+            <div class="text-4xl font-bold mb-4">
+                <span class="text-primary">a</span><span class="text-secondary">stami</span>
+            </div>
+            <h2 class="text-2xl font-bold text-base-content">
+                Crea il tuo account
+            </h2>
+            <p class="mt-2 text-sm text-base-content/70">
+                Oppure
+                <a asp-page="./Login" asp-route-returnUrl="@Model.ReturnUrl" class="link link-primary font-medium">
+                    accedi al tuo account esistente
+                </a>
+            </p>
+        </div>
 
-<div class="row">
-    <div class="col-md-4">
-        <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
-            <h2>Create a new account.</h2>
-            <hr />
-            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
-                <label asp-for="Input.Email">Email</label>
-                <span asp-validation-for="Input.Email" class="text-danger"></span>
-            </div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
-                <label asp-for="Input.Password">Password</label>
-                <span asp-validation-for="Input.Password" class="text-danger"></span>
-            </div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
-                <label asp-for="Input.ConfirmPassword">Confirm Password</label>
-                <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
-            </div>
-            <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
-        </form>
-    </div>
-    <div class="col-md-6 col-md-offset-2">
-        <section>
-            <h3>Use another service to register.</h3>
-            <hr />
-            @{
-                if ((Model.ExternalLogins?.Count ?? 0) == 0)
-                {
-                    <div>
-                        <p>
-                            There are no external authentication services configured. See this <a href="https://go.microsoft.com/fwlink/?LinkID=532715">article
-                            about setting up this ASP.NET application to support logging in via external services</a>.
-                        </p>
+        <!-- Registration Form -->
+        <div class="card bg-base-100 shadow-xl">
+            <div class="card-body">
+                <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-error mb-4" role="alert" style="@(ViewData.ModelState.IsValid ? "display: none;" : "")"></div>
+
+                    <!-- Email Field -->
+                    <div class="form-control mb-4">
+                        <label asp-for="Input.Email" class="label">
+                            <span class="label-text font-medium">Email</span>
+                        </label>
+                        <input asp-for="Input.Email" class="input input-bordered w-full @(ViewData.ModelState.ContainsKey("Input.Email") ? "" : "input-error")"
+                               autocomplete="username" aria-required="true" placeholder="nome@esempio.com" />
+                        <span asp-validation-for="Input.Email" class="label-text-alt text-error mt-1"></span>
                     </div>
-                }
-                else
-                {
-                    <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
-                        <div>
-                            <p>
+
+                    <!-- Password Field -->
+                    <div class="form-control mb-4">
+                        <label asp-for="Input.Password" class="label">
+                            <span class="label-text font-medium">Password</span>
+                        </label>
+                        <div class="relative">
+                            <input asp-for="Input.Password" type="password" class="input input-bordered w-full pr-10 @(ViewData.ModelState.ContainsKey("Input.Password") ? "" : "input-error")"
+                                   autocomplete="new-password" aria-required="true" placeholder="••••••••" />
+                            <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center" onclick="togglePassword('Input.Password')">
+                                <i class="fas fa-eye text-base-content/50" id="passwordToggleIcon"></i>
+                            </button>
+                        </div>
+                        <span asp-validation-for="Input.Password" class="label-text-alt text-error mt-1"></span>
+
+                        <!-- Password Requirements -->
+                        <div class="mt-2 text-xs text-base-content/60">
+                            <div class="grid grid-cols-1 gap-1">
+                                <div class="flex items-center">
+                                    <i class="fas fa-check text-success mr-2" id="length-check" style="display: none;"></i>
+                                    <i class="fas fa-times text-error mr-2" id="length-cross"></i>
+                                    <span>Almeno 6 caratteri</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Confirm Password Field -->
+                    <div class="form-control mb-6">
+                        <label asp-for="Input.ConfirmPassword" class="label">
+                            <span class="label-text font-medium">Conferma Password</span>
+                        </label>
+                        <div class="relative">
+                            <input asp-for="Input.ConfirmPassword" type="password" class="input input-bordered w-full pr-10 @(ViewData.ModelState.ContainsKey("Input.ConfirmPassword") ? "" : "input-error")"
+                                   autocomplete="new-password" aria-required="true" placeholder="••••••••" />
+                            <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center" onclick="togglePassword('Input.ConfirmPassword')">
+                                <i class="fas fa-eye text-base-content/50" id="confirmPasswordToggleIcon"></i>
+                            </button>
+                        </div>
+                        <span asp-validation-for="Input.ConfirmPassword" class="label-text-alt text-error mt-1"></span>
+                    </div>
+
+                    <!-- Terms and Conditions -->
+                    <div class="form-control mb-6">
+                        <label class="label cursor-pointer justify-start gap-3">
+                            <input type="checkbox" class="checkbox checkbox-primary" required />
+                            <span class="label-text text-sm">
+                                Accetto i
+                                <a href="#" class="link link-primary">Termini di Servizio</a>
+                                e la
+                                <a href="#" class="link link-primary">Privacy Policy</a>
+                            </span>
+                        </label>
+                    </div>
+
+                    <!-- Newsletter -->
+                    <div class="form-control mb-6">
+                        <label class="label cursor-pointer justify-start gap-3">
+                            <input type="checkbox" class="checkbox checkbox-secondary" />
+                            <span class="label-text text-sm">
+                                Voglio ricevere aggiornamenti e offerte speciali via email
+                            </span>
+                        </label>
+                    </div>
+
+                    <!-- Register Button -->
+                    <button id="registerSubmit" type="submit" class="btn btn-primary w-full mb-4">
+                        <i class="fas fa-user-plus mr-2"></i>
+                        Crea Account
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- External Logins -->
+        @{
+            if ((Model.ExternalLogins?.Count ?? 0) > 0)
+            {
+                <div class="card bg-base-100 shadow-xl">
+                    <div class="card-body">
+                        <div class="divider">Oppure registrati con</div>
+                        <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+                            <div class="space-y-3">
                                 @foreach (var provider in Model.ExternalLogins!)
                                 {
-                                    <button type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.DisplayName</button>
+                                    <button type="submit" class="btn btn-outline w-full" name="provider" value="@provider.Name"
+                                            title="Registrati usando il tuo account @provider.DisplayName">
+                                        <i class="fab fa-@provider.Name.ToLower() mr-2"></i>
+                                        @provider.DisplayName
+                                    </button>
                                 }
-                            </p>
-                        </div>
-                    </form>
-                }
+                            </div>
+                        </form>
+                    </div>
+                </div>
             }
-        </section>
+        }
+
+        <!-- Agency Registration CTA -->
+        <div class="card bg-gradient-to-r from-primary to-secondary text-white">
+            <div class="card-body text-center py-6">
+                <h3 class="text-lg font-bold mb-2">Sei un'agenzia immobiliare?</h3>
+                <p class="text-sm opacity-90 mb-4">Scopri i nostri piani business per digitalizzare la tua agenzia</p>
+                <button class="btn btn-outline btn-sm text-white border-white hover:bg-white hover:text-primary">
+                    <i class="fas fa-building mr-2"></i>
+                    Registrazione Agenzia
+                </button>
+            </div>
+        </div>
+
+        <!-- Help Text -->
+        <div class="text-center text-sm text-base-content/70">
+            <p>
+                Problemi con la registrazione?
+                <a href="#" class="link link-primary">Contatta il supporto</a>
+            </p>
+        </div>
     </div>
 </div>
+
+<script>
+    function togglePassword(fieldName) {
+        const passwordInput = document.querySelector(`input[name="${fieldName}"]`);
+        const toggleIcon = fieldName === 'Input.Password' ?
+            document.getElementById('passwordToggleIcon') :
+            document.getElementById('confirmPasswordToggleIcon');
+
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            toggleIcon.classList.remove('fa-eye');
+            toggleIcon.classList.add('fa-eye-slash');
+        } else {
+            passwordInput.type = 'password';
+            toggleIcon.classList.remove('fa-eye-slash');
+            toggleIcon.classList.add('fa-eye');
+        }
+    }
+
+    // Password validation
+    document.querySelector('input[name="Input.Password"]').addEventListener('input', function(e) {
+        const password = e.target.value;
+        const lengthCheck = document.getElementById('length-check');
+        const lengthCross = document.getElementById('length-cross');
+
+        if (password.length >= 6) {
+            lengthCheck.style.display = 'inline';
+            lengthCross.style.display = 'none';
+        } else {
+            lengthCheck.style.display = 'none';
+            lengthCross.style.display = 'inline';
+        }
+    });
+</script>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />

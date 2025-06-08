@@ -1,0 +1,97 @@
+﻿@import "tailwindcss";
+@plugin "daisyui";
+
+@plugin "daisyui/theme" {
+    name: "astami";
+    default: true;
+    prefersdark: false;
+    color-scheme: light;
+    --color-base-100: oklch(100% 0 0);
+    --color-base-200: oklch(96% 0 0);
+    --color-base-300: oklch(92% 0 0);
+    --color-base-content: oklch(20% 0.02 240);
+    --color-primary: oklch(65.69% 0.196 24.6); /* #FF7A00 */
+    --color-primary-content: oklch(100% 0 0);
+    --color-secondary: oklch(51.8% 0.176 243.83); /* #2E5BBA */
+    --color-secondary-content: oklch(100% 0 0);
+    --color-accent: oklch(69.71% 0.329 342.55);
+    --color-accent-content: oklch(100% 0 0);
+    --color-neutral: oklch(32.07% 0.02 197.78);
+    --color-neutral-content: oklch(100% 0 0);
+    --color-info: oklch(70% 0.2 220);
+    --color-info-content: oklch(98% 0.01 220);
+    --color-success: oklch(65% 0.25 140);
+    --color-success-content: oklch(98% 0.01 140);
+    --color-warning: oklch(80% 0.25 80);
+    --color-warning-content: oklch(20% 0.05 80);
+    --color-error: oklch(65% 0.3 30);
+    --color-error-content: oklch(98% 0.01 30);
+    --radius-selector: 0.5rem;
+    --radius-field: 0.375rem;
+    --radius-box: 0.5rem;
+    --size-selector: 0.25rem;
+    --size-field: 0.25rem;
+    --border: 1px;
+    --depth: 1;
+    --noise: 0;
+}
+
+@plugin "daisyui/theme" {
+    name: "astami-dark";
+    default: false;
+    prefersdark: true;
+    color-scheme: dark;
+    --color-base-100: oklch(18% 0.02 197.78);
+    --color-base-200: oklch(15% 0.02 197.78);
+    --color-base-300: oklch(12% 0.02 197.78);
+    --color-base-content: oklch(82% 0.02 197.78);
+    --color-primary: oklch(65.69% 0.196 24.6); /* #FF7A00 */
+    --color-primary-content: oklch(100% 0 0);
+    --color-secondary: oklch(51.8% 0.176 243.83); /* #2E5BBA */
+    --color-secondary-content: oklch(100% 0 0);
+    --color-accent: oklch(69.71% 0.329 342.55);
+    --color-accent-content: oklch(100% 0 0);
+    --color-neutral: oklch(23.07% 0.02 197.78);
+    --color-neutral-content: oklch(100% 0 0);
+    --color-info: oklch(70% 0.2 220);
+    --color-info-content: oklch(98% 0.01 220);
+    --color-success: oklch(65% 0.25 140);
+    --color-success-content: oklch(98% 0.01 140);
+    --color-warning: oklch(80% 0.25 80);
+    --color-warning-content: oklch(20% 0.05 80);
+    --color-error: oklch(65% 0.3 30);
+    --color-error-content: oklch(98% 0.01 30);
+    --radius-selector: 0.5rem;
+    --radius-field: 0.375rem;
+    --radius-box: 0.5rem;
+    --size-selector: 0.25rem;
+    --size-field: 0.25rem;
+    --border: 1px;
+    --depth: 1;
+    --noise: 0;
+}
+
+/* Stili personalizzati */
+.gradient-bg {
+    background: linear-gradient(135deg, #2E5BBA 0%, #1E3F7A 100%);
+}
+
+.text-gradient {
+    background: linear-gradient(135deg, #FF7A00 0%, #E56800 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.hero-pattern {
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='7' cy='7' r='7'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+PM > npx @tailwindcss/cli -i ./Astami/wwwroot/css/input.css -o ./Astami/wwwroot/css/output.css --watch
+npx : [3m[1m[34mâ‰ˆ[39m[22m[23m tailwindcss [34mv4.1.8[39m
+At line:1 char:1 + npx @tailwindcss/cli -i ./Astami/wwwroot/css/input.css -o ./Astami/ww ... + ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
++ CategoryInfo : NotSpecified: ([3m[1m[34mâ‰...[34mv4.1.8[39m:String) [], RemoteException + FullyQualifiedErrorId : NativeCommandError
+
+
+Done in [34m272ms[39m
+Done in [32m104Âµs[39m
+Done in [32m40ms[

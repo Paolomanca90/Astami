@@ -1,8 +1,292 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Il nuovo modo di proporre e scegliere immobili";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<!-- Hero Section -->
+<div class="hero min-h-screen gradient-bg hero-pattern">
+    <div class="hero-content text-center text-white">
+        <div class="max-w-4xl">
+            <h1 class="text-5xl md:text-7xl font-bold mb-6">
+                Compra o vendi il tuo<br>
+                <span class="text-gradient">immobile con Astami!</span>
+            </h1>
+            <p class="text-xl md:text-2xl mb-8 opacity-90">
+                Il nuovo modo di proporre e scegliere immobili in totale trasparenza.
+            </p>
+
+            <!-- Search Bar Hero -->
+            <div class="card bg-white/10 backdrop-blur-md border border-white/20 shadow-2xl p-6 mb-8">
+                <div class="flex flex-col md:flex-row gap-4">
+                    <div class="form-control flex-1">
+                        <input type="text" placeholder="Zona o città" class="input input-bordered input-lg bg-white text-black" />
+                    </div>
+                    <div class="form-control flex-1">
+                        <input type="text" placeholder="Budget max" class="input input-bordered input-lg bg-white text-black" />
+                    </div>
+                    <button class="btn btn-primary btn-lg px-8">
+                        <i class="fas fa-search mr-2"></i>
+                        CERCA
+                    </button>
+                </div>
+            </div>
+
+            <!-- CTA Buttons -->
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <button class="btn btn-primary btn-lg px-8">
+                    <i class="fas fa-home mr-2"></i>
+                    Vendi
+                </button>
+                <button class="btn btn-secondary btn-lg px-8">
+                    <i class="fas fa-chart-line mr-2"></i>
+                    Valuta
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
+
+<!-- Featured Properties Section -->
+<section class="py-20 bg-base-100">
+    <div class="container mx-auto px-4">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl font-bold mb-4">
+                Dai un'occhiata agli immobili in <span class="text-primary">evidenza</span>
+            </h2>
+            <p class="text-lg text-base-content/70 max-w-3xl mx-auto">
+                Immobili selezionati dalle migliori agenzie che utilizzano il nostro sistema di aste trasparenti
+            </p>
+        </div>
+
+        <!-- Property Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Property Card 1 -->
+            <div class="card bg-base-100 shadow-xl hover:shadow-2xl transition-all duration-300">
+                <figure class="relative">
+                    <img src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&h=250&fit=crop" alt="Appartamento Milano" class="w-full h-48 object-cover" />
+                    <div class="absolute top-4 left-4">
+                        <div class="badge badge-primary font-bold">IN ASTA</div>
+                    </div>
+                    <div class="absolute top-4 right-4 bg-black/50 rounded-full p-2">
+                        <i class="fas fa-heart text-white"></i>
+                    </div>
+                </figure>
+                <div class="card-body p-4">
+                    <h3 class="card-title text-lg">Appartamento moderno</h3>
+                    <p class="text-sm text-base-content/70">Milano, Porta Romana</p>
+                    <div class="flex items-center gap-2 text-sm">
+                        <span class="badge badge-outline">3 locali</span>
+                        <span class="badge badge-outline">85 m²</span>
+                    </div>
+                    <div class="flex justify-between items-center mt-4">
+                        <div>
+                            <span class="text-sm text-base-content/70">da:</span>
+                            <div class="text-xl font-bold text-primary">€1.200/mese</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-sm text-base-content/70">Scade tra:</div>
+                            <div class="font-bold text-error">2h 30m</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Property Card 2 -->
+            <div class="card bg-base-100 shadow-xl hover:shadow-2xl transition-all duration-300">
+                <figure class="relative">
+                    <img src="https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=400&h=250&fit=crop" alt="Villa Roma" class="w-full h-48 object-cover" />
+                    <div class="absolute top-4 left-4">
+                        <div class="badge badge-secondary font-bold">VENDITA</div>
+                    </div>
+                    <div class="absolute top-4 right-4 bg-black/50 rounded-full p-2">
+                        <i class="fas fa-heart text-white"></i>
+                    </div>
+                </figure>
+                <div class="card-body p-4">
+                    <h3 class="card-title text-lg">Villa con giardino</h3>
+                    <p class="text-sm text-base-content/70">Roma, EUR</p>
+                    <div class="flex items-center gap-2 text-sm">
+                        <span class="badge badge-outline">5 locali</span>
+                        <span class="badge badge-outline">180 m²</span>
+                        <span class="badge badge-outline">Giardino</span>
+                    </div>
+                    <div class="flex justify-between items-center mt-4">
+                        <div>
+                            <span class="text-sm text-base-content/70">da:</span>
+                            <div class="text-xl font-bold text-primary">€450.000</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-sm text-base-content/70">Scade tra:</div>
+                            <div class="font-bold text-error">5h 12m</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Property Card 3 -->
+            <div class="card bg-base-100 shadow-xl hover:shadow-2xl transition-all duration-300">
+                <figure class="relative">
+                    <img src="https://images.unsplash.com/photo-1484154218962-a197022b5858?w=400&h=250&fit=crop" alt="Loft Torino" class="w-full h-48 object-cover" />
+                    <div class="absolute top-4 left-4">
+                        <div class="badge badge-primary font-bold">IN ASTA</div>
+                    </div>
+                    <div class="absolute top-4 right-4 bg-black/50 rounded-full p-2">
+                        <i class="fas fa-heart text-white"></i>
+                    </div>
+                </figure>
+                <div class="card-body p-4">
+                    <h3 class="card-title text-lg">Loft industriale</h3>
+                    <p class="text-sm text-base-content/70">Torino, Centro</p>
+                    <div class="flex items-center gap-2 text-sm">
+                        <span class="badge badge-outline">2 locali</span>
+                        <span class="badge badge-outline">95 m²</span>
+                        <span class="badge badge-outline">Terrazza</span>
+                    </div>
+                    <div class="flex justify-between items-center mt-4">
+                        <div>
+                            <span class="text-sm text-base-content/70">da:</span>
+                            <div class="text-xl font-bold text-primary">€950/mese</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-sm text-base-content/70">Scade tra:</div>
+                            <div class="font-bold text-error">1h 45m</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Property Card 4 -->
+            <div class="card bg-base-100 shadow-xl hover:shadow-2xl transition-all duration-300">
+                <figure class="relative">
+                    <img src="https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=400&h=250&fit=crop" alt="Attico Firenze" class="w-full h-48 object-cover" />
+                    <div class="absolute top-4 left-4">
+                        <div class="badge badge-secondary font-bold">VENDITA</div>
+                    </div>
+                    <div class="absolute top-4 right-4 bg-black/50 rounded-full p-2">
+                        <i class="fas fa-heart text-white"></i>
+                    </div>
+                </figure>
+                <div class="card-body p-4">
+                    <h3 class="card-title text-lg">Attico panoramico</h3>
+                    <p class="text-sm text-base-content/70">Firenze, Centro Storico</p>
+                    <div class="flex items-center gap-2 text-sm">
+                        <span class="badge badge-outline">4 locali</span>
+                        <span class="badge badge-outline">120 m²</span>
+                        <span class="badge badge-outline">Vista</span>
+                    </div>
+                    <div class="flex justify-between items-center mt-4">
+                        <div>
+                            <span class="text-sm text-base-content/70">da:</span>
+                            <div class="text-xl font-bold text-primary">€680.000</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-sm text-base-content/70">Scade tra:</div>
+                            <div class="font-bold text-error">3h 20m</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-12">
+            <button class="btn btn-primary btn-lg">
+                <i class="fas fa-eye mr-2"></i>
+                Vedi tutti gli immobili
+            </button>
+        </div>
+    </div>
+</section>
+
+<!-- How it Works Section -->
+<section class="py-20 bg-base-200">
+    <div class="container mx-auto px-4">
+        <div class="text-center mb-16">
+            <h2 class="text-4xl font-bold mb-4">
+                Trovare qui l'immobile giusto per te è <span class="text-primary">facile</span>
+            </h2>
+            <p class="text-lg text-base-content/70 max-w-3xl mx-auto">
+                Il nostro sistema di aste trasparenti garantisce il miglior prezzo sia per chi vende che per chi acquista
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Step 1 -->
+            <div class="text-center">
+                <div class="w-20 h-20 bg-primary rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i class="fas fa-search text-2xl text-white"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-4">Trova l'immobile</h3>
+                <p class="text-base-content/70">
+                    Cerca tra migliaia di immobili verificati dalle migliori agenzie. Filtra per zona, prezzo e caratteristiche.
+                </p>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="text-center">
+                <div class="w-20 h-20 bg-secondary rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i class="fas fa-gavel text-2xl text-white"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-4">Partecipa all'asta</h3>
+                <p class="text-base-content/70">
+                    Fai la tua offerta in tempo reale. Il sistema trasparente ti permette di vedere tutte le offerte e competere lealmente.
+                </p>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="text-center">
+                <div class="w-20 h-20 bg-accent rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i class="fas fa-key text-2xl text-white"></i>
+                </div>
+                <h3 class="text-xl font-bold mb-4">Ottieni l'immobile</h3>
+                <p class="text-base-content/70">
+                    Se vinci l'asta, l'immobile è tuo! Gestiamo tutto digitalmente: contratti, pagamenti e documenti.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section for Agencies -->
+<section class="py-20 gradient-bg text-white">
+    <div class="container mx-auto px-4 text-center">
+        <h2 class="text-4xl font-bold mb-6">
+            Sei un'agenzia immobiliare?
+        </h2>
+        <p class="text-xl mb-8 opacity-90 max-w-3xl mx-auto">
+            Digitalizza la tua agenzia con Astami. Gestisci immobili, aste trasparenti, documenti e pagamenti tutto in un'unica piattaforma.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <button class="btn btn-primary btn-lg px-8">
+                <i class="fas fa-rocket mr-2"></i>
+                Inizia Gratis
+            </button>
+            <button class="btn btn-outline btn-lg px-8 text-white border-white hover:bg-white hover:text-neutral">
+                <i class="fas fa-play-circle mr-2"></i>
+                Guarda la Demo
+            </button>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Section -->
+<section class="py-20 bg-base-100">
+    <div class="container mx-auto px-4">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+            <div>
+                <div class="text-4xl font-bold text-primary mb-2">1000+</div>
+                <div class="text-base-content/70">Immobili disponibili</div>
+            </div>
+            <div>
+                <div class="text-4xl font-bold text-primary mb-2">250+</div>
+                <div class="text-base-content/70">Agenzie partner</div>
+            </div>
+            <div>
+                <div class="text-4xl font-bold text-primary mb-2">15%</div>
+                <div class="text-base-content/70">Risparmio medio</div>
+            </div>
+            <div>
+                <div class="text-4xl font-bold text-primary mb-2">98%</div>
+                <div class="text-base-content/70">Clienti soddisfatti</div>
+            </div>
+        </div>
+    </div>
+</section>

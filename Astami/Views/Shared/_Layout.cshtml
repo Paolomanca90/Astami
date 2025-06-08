@@ -5,46 +5,115 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Astami</title>
     <script type="importmap"></script>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Astami.styles.css" asp-append-version="true" />
+
+    <!-- DaisyUI 5 + Tailwind CSS v4 -->
+    <link rel="stylesheet" href="~/css/output.css" asp-append-version="true" />
+
+    <!-- Font Awesome per le icone -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Astami</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
+        <nav class="navbar bg-base-100 shadow-lg sticky top-0 z-50">
+            <div class="navbar-start">
+                <div class="dropdown">
+                    <div tabindex="0" role="button" class="btn btn-ghost lg:hidden">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16"></path>
+                        </svg>
+                    </div>
+                    <ul tabindex="0" class="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow">
+                        <li><a asp-area="" asp-controller="Home" asp-action="Privacy" class="font-medium">Chi Siamo</a></li>
+                        <li><a href="#" class="font-medium">Pricing</a></li>
                     </ul>
-                    <partial name="_LoginPartial" />
                 </div>
+                <a asp-area="" asp-controller="Home" asp-action="Index" class="btn btn-ghost text-2xl font-bold text-astami-blue">
+                    <span class="text-astami-orange">a</span>stami
+                </a>
+            </div>
+
+            <div class="navbar-center hidden lg:flex">
+                <!-- Barra di ricerca -->
+                <div class="form-control">
+                    <div class="input-group">
+                        <input type="text" placeholder="Cerca agenzie o zone..." class="input input-bordered w-80" />
+                        <button class="btn btn-square btn-primary">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="navbar-end">
+                <div class="hidden lg:flex">
+                    <ul class="menu menu-horizontal px-1">
+                        <li><a asp-area="" asp-controller="Home" asp-action="Privacy" class="font-medium hover:text-primary">Chi Siamo</a></li>
+                        <li><a href="#" class="font-medium hover:text-primary">Pricing</a></li>
+                    </ul>
+                </div>
+
+                <!-- Theme Toggle -->
+                <label class="btn btn-ghost btn-circle swap swap-rotate mr-2">
+                    <input type="checkbox" class="theme-controller" value="dark" />
+                    <i class="fas fa-sun swap-off text-lg"></i>
+                    <i class="fas fa-moon swap-on text-lg"></i>
+                </label>
+
+                <!-- Auth Section -->
+                <partial name="_LoginPartial" />
             </div>
         </nav>
     </header>
-    <div class="container">
-        <main role="main" class="pb-3">
+    <div>
+        <main>
             @RenderBody()
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - Astami - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
+    <footer class="footer footer-center bg-neutral text-neutral-content p-10">
+        <aside>
+            <div class="text-3xl font-bold">
+                <span class="text-primary">a</span>stami
+            </div>
+            <p class="font-bold">
+                Il nuovo modo di proporre e scegliere immobili in totale trasparenza.
+            </p>
+            <p>Copyright © 2025 - Astami</p>
+        </aside>
+        <nav>
+            <div class="grid grid-flow-col gap-4">
+                <a asp-area="" asp-controller="Home" asp-action="Privacy" class="link link-hover">Privacy</a>
+                <a href="#" class="link link-hover">Termini di Servizio</a>
+                <a href="#" class="link link-hover">Contatti</a>
+            </div>
+        </nav>
     </footer>
+
+    <script>
+        // Theme toggle functionality
+        const themeController = document.querySelector('.theme-controller');
+        const htmlElement = document.documentElement;
+
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme') || 'astami';
+        htmlElement.setAttribute('data-theme', savedTheme);
+        if (savedTheme === 'dark') {
+            themeController.checked = true;
+        }
+
+        themeController.addEventListener('change', function() {
+            if (this.checked) {
+                htmlElement.setAttribute('data-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                htmlElement.setAttribute('data-theme', 'astami');
+                localStorage.setItem('theme', 'astami');
+            }
+        });
+    </script>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
