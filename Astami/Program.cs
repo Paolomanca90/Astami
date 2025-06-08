@@ -1,137 +1,153 @@
+// Program.cs
 using Astami.Data;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using Google.Apis.Auth.AspNetCore3;
-using Microsoft.AspNetCore.Authentication;
-using System.Security.Claims;
-using Astami.Utilities.Roles;
 using Astami.Models;
+using Astami.Utilities.Roles;
 using Astami.Utilities.Subscriptions;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ??
+	throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(connectionString));
+	options.UseSqlServer(connectionString));
+
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
+// Configurazione Identity con ApplicationUser personalizzato
 builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
 {
-	options.SignIn.RequireConfirmedAccount = false;
+	// Configurazione password
 	options.Password.RequireDigit = true;
-	options.Password.RequiredLength = 8;
+	options.Password.RequiredLength = 6;
+	options.Password.RequireNonAlphanumeric = false;
+	options.Password.RequireUppercase = true;
+	options.Password.RequireLowercase = true;
+
+	// Configurazione utente
+	options.User.RequireUniqueEmail = true;
+
+	// Configurazione lockout
+	options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
+	options.Lockout.MaxFailedAccessAttempts = 5;
+
+	// Configurazione conferma email (disabilitata per sviluppo)
+	options.SignIn.RequireConfirmedAccount = false;
+	options.SignIn.RequireConfirmedEmail = false;
 })
-	.AddRoles<IdentityRole>()
-	.AddEntityFrameworkStores<ApplicationDbContext>()
-	.AddDefaultTokenProviders();
+.AddRoles<IdentityRole>()
+.AddEntityFrameworkStores<ApplicationDbContext>();
 
-builder.Services.AddAuthentication()
-	.AddCookie()
-	.AddGoogleOpenIdConnect(options =>
-	{
-		IConfigurationSection googleAuthNSection = builder.Configuration.GetSection("Google+");
-		options.ClientId = googleAuthNSection["ClientId"];
-		options.ClientSecret = googleAuthNSection["SecretId"];
-	});
-
-builder.Services.PostConfigure<AuthenticationOptions>(options =>
-{
-	foreach (var scheme in options.Schemes)
-	{
-		if (scheme.Name == GoogleOpenIdConnectDefaults.AuthenticationScheme)
-		{
-			scheme.DisplayName = "Accedi con Google";
-		}
-	}
-});
-
-builder.Services.AddSession(options =>
-{
-	options.IdleTimeout = TimeSpan.FromMinutes(30);
-	options.Cookie.HttpOnly = true;
-	options.Cookie.IsEssential = true;
-});
-
+// Aggiungere servizi MVC
 builder.Services.AddControllersWithViews();
-builder.Services.AddRazorPages();
 
-builder.Services.ConfigureApplicationCookie(options =>
-{
-	options.ExpireTimeSpan = TimeSpan.FromMinutes(180);
-	options.SlidingExpiration = true;
-	options.Events.OnValidatePrincipal = async context =>
-	{
-		var userManager = context.HttpContext.RequestServices.GetRequiredService<UserManager<ApplicationUser>>();
-		var user = await userManager.GetUserAsync(context.Principal);
-
-		if (user != null)
-		{
-			var roles = await userManager.GetRolesAsync(user);
-			var identity = new ClaimsIdentity();
-			foreach (var role in roles)
-			{
-				identity.AddClaim(new Claim(ClaimTypes.Role, role));
-			}
-
-			context.Principal.AddIdentity(identity);
-		}
-		else
-		{
-			context.RejectPrincipal();
-			return;
-		}
-	};
-});
-
-builder.Services.AddHttpClient();
-//StripeConfiguration.ApiKey = builder.Configuration.GetValue<string>("Stripe:SecretKey");
+// Configurazione per servizi aggiuntivi
+builder.Services.AddScoped<IEmailSender, EmailSender>(); // Da implementare per invio email
 
 var app = builder.Build();
 
+// Inizializzazione del database e seeding
 using (var scope = app.Services.CreateScope())
 {
 	var services = scope.ServiceProvider;
 	try
 	{
 		var context = services.GetRequiredService<ApplicationDbContext>();
+
+		// Assicurarsi che il database sia creato
+		context.Database.EnsureCreated();
+
+		// Eseguire le migrazioni se necessario
+		if (context.Database.GetPendingMigrations().Any())
+		{
+			context.Database.Migrate();
+		}
+
+		// Inizializzare ruoli
+		await RolesInitializer.InitializeRoles(services);
+
+		// Inizializzare abbonamenti
 		await SubscriptionsInitializer.InitializeSubscriptions(context);
 
-		await RolesInitializer.InitializeRoles(services);
+		// Creare utente admin di default se non esiste
+		await CreateDefaultAdminUser(services);
 	}
 	catch (Exception ex)
 	{
 		var logger = services.GetRequiredService<ILogger<Program>>();
-		logger.LogError(ex, "Errore durante l'inizializzazione");
+		logger.LogError(ex, "An error occurred creating the DB.");
 	}
 }
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseMigrationsEndPoint();
+	app.UseMigrationsEndPoint();
 }
 else
 {
-    app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
+	app.UseExceptionHandler("/Home/Error");
+	app.UseHsts();
 }
 
 app.UseHttpsRedirection();
+app.UseStaticFiles();
+
 app.UseRouting();
+
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseSession();
-
-app.MapStaticAssets();
 
 app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}")
-    .WithStaticAssets();
+	name: "default",
+	pattern: "{controller=Home}/{action=Index}/{id?}");
 
-app.MapRazorPages()
-   .WithStaticAssets();
+app.MapRazorPages();
 
 app.Run();
+
+// Metodo per creare utente admin di default
+static async Task CreateDefaultAdminUser(IServiceProvider serviceProvider)
+{
+	var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+	var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+	string adminEmail = "admin@astami.co";
+	string adminPassword = "Admin123!";
+
+	if (await userManager.FindByEmailAsync(adminEmail) == null)
+	{
+		var adminUser = new ApplicationUser
+		{
+			UserName = adminEmail,
+			Email = adminEmail,
+			EmailConfirmed = true,
+			Nome = "Admin",
+			Cognome = "Astami",
+			DataRegistrazione = DateTime.UtcNow
+		};
+
+		var result = await userManager.CreateAsync(adminUser, adminPassword);
+
+		if (result.Succeeded)
+		{
+			await userManager.AddToRoleAsync(adminUser, Astami.Utilities.Constants.RolesConstants.Admin);
+		}
+	}
+}
+
+// Implementazione temporanea del servizio Email
+public class EmailSender : IEmailSender
+{
+	public Task SendEmailAsync(string email, string subject, string htmlMessage)
+	{
+		// TODO: Implementare invio email reale (SendGrid, SMTP, etc.)
+		// Per ora log nel console
+		Console.WriteLine($"Sending email to {email}: {subject}");
+		return Task.CompletedTask;
+	}
+}

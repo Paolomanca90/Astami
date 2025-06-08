@@ -7,46 +7,53 @@ namespace Astami.Utilities.Subscriptions
 	{
 		public static async Task InitializeSubscriptions(ApplicationDbContext _context)
 		{
-			if (!_context.Abbonamento.Any(x => x.AbbonamentoId == SubscriptionsConstants.Standard))
+			// Basic Plan - €99/mese
+			if (!_context.Abbonamento.Any(x => x.AbbonamentoId == SubscriptionsConstants.Basic))
 			{
-				var abbonamentoStandard = new Models.Abbonamento
+				var abbonamentoBasic = new Models.Abbonamento
 				{
-					AbbonamentoId = SubscriptionsConstants.Standard,
-					Nome = "Abbonamento Standard",
-					Descrizione = "Accesso base alle funzionalità.",
-					Prezzo = 9.99m,
-					Durata = 30
+					AbbonamentoId = SubscriptionsConstants.Basic,
+					Nome = "Basic",
+					Descrizione = "Dashboard gestionale privata • Caricamento e gestione immobili • Accesso clienti con richieste digitali • Notifiche automatiche e report base",
+					Prezzo = 99.00m,
+					Durata = 30 // giorni
 				};
-				_context.Abbonamento.Add(abbonamentoStandard);
+				_context.Abbonamento.Add(abbonamentoBasic);
 			}
 
+			// PRO Plan - €149/mese  
 			if (!_context.Abbonamento.Any(x => x.AbbonamentoId == SubscriptionsConstants.Pro))
 			{
-				var abbonamentoPremium = new Models.Abbonamento
+				var abbonamentoPro = new Models.Abbonamento
 				{
 					AbbonamentoId = SubscriptionsConstants.Pro,
-					Nome = "Abbonamento Pro",
-					Descrizione = "Accesso completo a tutte le funzionalità.",
-					Prezzo = 29.99m,
-					Durata = 30
+					Nome = "PRO",
+					Descrizione = "Tutto nel piano Basic • Offerte libere digitalizzate • Personalizzazione tempistiche • Notifiche smart per clienti e agenti • Report avanzati sulle performance",
+					Prezzo = 149.00m,
+					Durata = 30 // giorni
 				};
-				_context.Abbonamento.Add(abbonamentoPremium);
+				_context.Abbonamento.Add(abbonamentoPro);
 			}
 
-			if (!_context.Abbonamento.Any(x => x.AbbonamentoId == SubscriptionsConstants.Business))
+			// Enterprise Plan - €499/mese
+			if (!_context.Abbonamento.Any(x => x.AbbonamentoId == SubscriptionsConstants.Enterprice))
 			{
-				var abbonamentoBusiness = new Models.Abbonamento
+				var abbonamentoEnterprise = new Models.Abbonamento
 				{
-					AbbonamentoId = SubscriptionsConstants.Business,
-					Nome = "Abbonamento Business",
-					Descrizione = "Accesso esclusivo con vantaggi premium.",
-					Prezzo = 59.99m,
-					Durata = 30
+					AbbonamentoId = SubscriptionsConstants.Enterprice,
+					Nome = "Enterprise",
+					Descrizione = "Tutto nel piano Pro • Firma digitale e gestione contratti • Pagamenti e transazioni online • Integrazione con CRM e portali immobiliari • Supporto premium dedicato",
+					Prezzo = 499.00m,
+					Durata = 30 // giorni
 				};
-				_context.Abbonamento.Add(abbonamentoBusiness);
+				_context.Abbonamento.Add(abbonamentoEnterprise);
 			}
 
-			await _context.SaveChangesAsync();
+			// Salva le modifiche solo se ci sono stati cambiamenti
+			if (_context.ChangeTracker.HasChanges())
+			{
+				await _context.SaveChangesAsync();
+			}
 		}
 	}
 }
