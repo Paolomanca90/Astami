@@ -1,4 +1,16 @@
 ﻿@import "tailwindcss";
+
+/* SOLUZIONE ROBUSTA: Multiple dark mode selectors per compatibilità */
+@custom-variant dark (&:where(.dark, .dark *));
+@custom-variant dark-data (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* Fallback CSS per assicurarsi che la dark mode funzioni sempre */
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme]):not(.light) {
+        color-scheme: dark;
+    }
+}
+
 @plugin "daisyui";
 
 @plugin "daisyui/theme" {
@@ -10,9 +22,9 @@
     --color-base-200: oklch(96% 0 0);
     --color-base-300: oklch(92% 0 0);
     --color-base-content: oklch(20% 0.02 240);
-    --color-primary: oklch(65.69% 0.196 24.6); /* #FF7A00 */
+    --color-primary: oklch(65.69% 0.196 24.6);
     --color-primary-content: oklch(100% 0 0);
-    --color-secondary: oklch(51.8% 0.176 243.83); /* #2E5BBA */
+    --color-secondary: oklch(51.8% 0.176 243.83);
     --color-secondary-content: oklch(100% 0 0);
     --color-accent: oklch(69.71% 0.329 342.55);
     --color-accent-content: oklch(100% 0 0);
@@ -37,7 +49,7 @@
 }
 
 @plugin "daisyui/theme" {
-    name: "astami-dark";
+    name: "dark";
     default: false;
     prefersdark: true;
     color-scheme: dark;
@@ -45,9 +57,9 @@
     --color-base-200: oklch(15% 0.02 197.78);
     --color-base-300: oklch(12% 0.02 197.78);
     --color-base-content: oklch(82% 0.02 197.78);
-    --color-primary: oklch(65.69% 0.196 24.6); /* #FF7A00 */
+    --color-primary: oklch(65.69% 0.196 24.6);
     --color-primary-content: oklch(100% 0 0);
-    --color-secondary: oklch(51.8% 0.176 243.83); /* #2E5BBA */
+    --color-secondary: oklch(51.8% 0.176 243.83);
     --color-secondary-content: oklch(100% 0 0);
     --color-accent: oklch(69.71% 0.329 342.55);
     --color-accent-content: oklch(100% 0 0);
@@ -71,27 +83,251 @@
     --noise: 0;
 }
 
-/* Stili personalizzati */
-.gradient-bg {
-    background: linear-gradient(135deg, #2E5BBA 0%, #1E3F7A 100%);
+/* Colori personalizzati Astami */
+:root {
+    --astami-orange: #FF7A00;
+    --astami-blue: #2E5BBA;
+    --astami-gradient: linear-gradient(135deg, #2E5BBA 0%, #1E3F7A 100%);
 }
 
+/* Dark mode gradient - DOPPIO SELETTORE */
+.dark, [data-theme="dark"] {
+    --astami-gradient: linear-gradient(135deg, #1E3F7A 0%, #0F1F3D 100%);
+}
+
+/* Classi colori personalizzate */
+.text-astami-orange {
+    color: var(--astami-orange);
+}
+
+.text-astami-blue {
+    color: var(--astami-blue);
+}
+
+.bg-astami-orange {
+    background-color: var(--astami-orange);
+}
+
+.bg-astami-blue {
+    background-color: var(--astami-blue);
+}
+
+.border-astami-orange {
+    border-color: var(--astami-orange);
+}
+
+.border-astami-blue {
+    border-color: var(--astami-blue);
+}
+
+/* Gradiente principale */
+.gradient-bg {
+    background: var(--astami-gradient);
+}
+
+/* Gradiente per il testo */
 .text-gradient {
-    background: linear-gradient(135deg, #FF7A00 0%, #E56800 100%);
+    background: linear-gradient(135deg, var(--astami-orange) 0%, #E56800 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    color: transparent;
+    display: inline-block;
 }
 
+/* Pattern per l'hero */
 .hero-pattern {
-    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='7' cy='7' r='7'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    background-image: var(--astami-gradient), url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.08'%3E%3Ccircle cx='7' cy='7' r='7'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    background-blend-mode: overlay;
 }
-PM > npx @tailwindcss/cli -i ./Astami/wwwroot/css/input.css -o ./Astami/wwwroot/css/output.css --watch
-npx : [3m[1m[34mâ‰ˆ[39m[22m[23m tailwindcss [34mv4.1.8[39m
-At line:1 char:1 + npx @tailwindcss/cli -i ./Astami/wwwroot/css/input.css -o ./Astami/ww ... + ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~
-+ CategoryInfo : NotSpecified: ([3m[1m[34mâ‰...[34mv4.1.8[39m:String) [], RemoteException + FullyQualifiedErrorId : NativeCommandError
 
+/* Hero migliorato */
+.hero-improved {
+    min-height: 100vh;
+    background: var(--astami-gradient);
+    position: relative;
+    overflow: hidden;
+}
 
-Done in [34m272ms[39m
-Done in [32m104Âµs[39m
-Done in [32m40ms[
+    .hero-improved::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='7' cy='7' r='7'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        animation: float-gentle 30s ease-in-out infinite;
+    }
+
+/* Dark mode hero pattern - DOPPIO SELETTORE */
+.dark .hero-improved::before,
+[data-theme="dark"] .hero-improved::before {
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Ccircle cx='7' cy='7' r='7'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* FALLBACK CSS per dark: utilities che non funzionano con @custom-variant */
+
+/* Esempio di fallback per classi comuni */
+[data-theme="dark"] .dark\:text-white,
+.dark .dark\:text-white {
+    color: white !important;
+}
+
+[data-theme="dark"] .dark\:text-gray-300,
+.dark .dark\:text-gray-300 {
+    color: rgb(209 213 219) !important;
+}
+
+[data-theme="dark"] .dark\:bg-gray-800,
+.dark .dark\:bg-gray-800 {
+    background-color: rgb(31 41 55) !important;
+}
+
+[data-theme="dark"] .dark\:bg-gray-900,
+.dark .dark\:bg-gray-900 {
+    background-color: rgb(17 24 39) !important;
+}
+
+/* Resto del CSS rimane uguale... */
+@keyframes float-gentle {
+    0%, 100% {
+        background-position: 0% 0%;
+    }
+
+    25% {
+        background-position: 5% 3%;
+    }
+
+    50% {
+        background-position: 10% 6%;
+    }
+
+    75% {
+        background-position: 5% 3%;
+    }
+}
+
+.card-hover {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+    .card-hover:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+
+.badge-auction {
+    background: linear-gradient(135deg, var(--astami-orange), #E56800);
+    border: none;
+    color: white;
+    font-weight: 600;
+    animation: pulse-glow 2s infinite;
+}
+
+@keyframes pulse-glow {
+    0%, 100% {
+        box-shadow: 0 0 10px rgba(255, 122, 0, 0.3);
+    }
+
+    50% {
+        box-shadow: 0 0 20px rgba(255, 122, 0, 0.6);
+    }
+}
+
+.badge-sale {
+    background: linear-gradient(135deg, var(--astami-blue), #1E3F7A);
+    border: none;
+    color: white;
+    font-weight: 600;
+}
+
+.btn-animate {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+    .btn-animate::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s;
+    }
+
+    .btn-animate:hover::before {
+        left: 100%;
+    }
+
+.navbar-glassmorphism {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.dark .navbar-glassmorphism,
+[data-theme="dark"] .navbar-glassmorphism {
+    background: rgba(24, 24, 27, 0.95);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.brand-astami {
+    font-family: inherit;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+}
+
+body {
+    padding-bottom: 0;
+    margin-bottom: 0;
+}
+
+main {
+    min-height: 100vh;
+    position: relative;
+}
+
+.footer {
+    margin-top: 0;
+    position: relative;
+    z-index: 10;
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--color-base-200);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--astami-orange);
+    border-radius: 4px;
+}
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #E56800;
+    }
+
+@media (max-width: 768px) {
+    .hero-improved {
+        min-height: 80vh;
+    }
+
+    .text-gradient {
+        font-size: 2.5rem;
+    }
+}
+
+.btn:focus-visible,
+.input:focus-visible,
+.select:focus-visible {
+    outline: 2px solid var(--astami-orange);
+    outline-offset: 2px;
+}

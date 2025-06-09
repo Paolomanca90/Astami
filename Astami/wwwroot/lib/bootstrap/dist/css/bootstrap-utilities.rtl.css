@@ -1836,7 +1836,7 @@
 .text-nowrap {
   white-space: nowrap !important;
 }
-.text-primary {
+.text-astami-orange {
   --bs-text-opacity: 1;
   color: rgba(var(--bs-primary-rgb), var(--bs-text-opacity)) !important;
 }
@@ -1942,7 +1942,7 @@
   --bs-text-opacity: 1;
 }
 
-.text-primary-emphasis {
+.text-astami-orange-emphasis {
   color: var(--bs-primary-text-emphasis) !important;
 }
 
