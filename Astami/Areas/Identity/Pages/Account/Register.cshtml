@@ -16,7 +16,7 @@
             </h2>
             <p class="mt-2 text-sm text-base-content/70">
                 Oppure
-                <a asp-page="./Login" asp-route-returnUrl="@Model.ReturnUrl" class="link link-primary font-medium">
+                <a asp-page="./Login" asp-route-returnUrl="@Model.ReturnUrl" class="link text-astami-orange font-medium">
                     accedi al tuo account esistente
                 </a>
             </p>
@@ -33,7 +33,7 @@
                         <label asp-for="Input.Email" class="label">
                             <span class="label-text font-medium">Email</span>
                         </label>
-                        <input asp-for="Input.Email" class="input input-bordered w-full @(ViewData.ModelState.ContainsKey("Input.Email") ? "" : "input-error")"
+                        <input asp-for="Input.Email" class="input border-astami-orange w-full @(ViewData.ModelState.ContainsKey("Input.Email") ? "" : "input-error")"
                                autocomplete="username" aria-required="true" placeholder="nome@esempio.com" />
                         <span asp-validation-for="Input.Email" class="label-text-alt text-error mt-1"></span>
                     </div>
@@ -44,7 +44,7 @@
                             <span class="label-text font-medium">Password</span>
                         </label>
                         <div class="relative">
-                            <input asp-for="Input.Password" type="password" class="input input-bordered w-full pr-10 @(ViewData.ModelState.ContainsKey("Input.Password") ? "" : "input-error")"
+                            <input asp-for="Input.Password" type="password" class="input border-astami-orange w-full pr-10 @(ViewData.ModelState.ContainsKey("Input.Password") ? "" : "input-error")"
                                    autocomplete="new-password" aria-required="true" placeholder="••••••••" />
                             <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center" onclick="togglePassword('Input.Password')">
                                 <i class="fas fa-eye text-base-content/50" id="passwordToggleIcon"></i>
@@ -57,7 +57,7 @@
                             <div class="grid grid-cols-1 gap-1">
                                 <div class="flex items-center">
                                     <i class="fas fa-check text-success mr-2" id="length-check" style="display: none;"></i>
-                                    <i class="fas fa-times text-error mr-2" id="length-cross"></i>
+                                    <i class="fas fa-times text-astami-dark-orange mr-2" id="length-cross"></i>
                                     <span>Almeno 6 caratteri</span>
                                 </div>
                             </div>
@@ -70,7 +70,7 @@
                             <span class="label-text font-medium">Conferma Password</span>
                         </label>
                         <div class="relative">
-                            <input asp-for="Input.ConfirmPassword" type="password" class="input input-bordered w-full pr-10 @(ViewData.ModelState.ContainsKey("Input.ConfirmPassword") ? "" : "input-error")"
+                            <input asp-for="Input.ConfirmPassword" type="password" class="input border-astami-orange w-full pr-10 @(ViewData.ModelState.ContainsKey("Input.ConfirmPassword") ? "" : "input-error")"
                                    autocomplete="new-password" aria-required="true" placeholder="••••••••" />
                             <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center" onclick="togglePassword('Input.ConfirmPassword')">
                                 <i class="fas fa-eye text-base-content/50" id="confirmPasswordToggleIcon"></i>
@@ -82,12 +82,12 @@
                     <!-- Terms and Conditions -->
                     <div class="form-control mb-6">
                         <label class="label cursor-pointer justify-start gap-3">
-                            <input type="checkbox" class="checkbox checkbox-primary" required />
+                            <input type="checkbox" class="checkbox checkbox-astami-orange" required />
                             <span class="label-text text-sm">
                                 Accetto i
-                                <a href="#" class="link link-primary">Termini di Servizio</a>
+                                <a href="#" class="link text-astami-orange">Termini di Servizio</a>
                                 e la
-                                <a href="#" class="link link-primary">Privacy Policy</a>
+                                <a href="#" class="link text-astami-orange">Privacy Policy</a>
                             </span>
                         </label>
                     </div>
@@ -95,7 +95,7 @@
                     <!-- Newsletter -->
                     <div class="form-control mb-6">
                         <label class="label cursor-pointer justify-start gap-3">
-                            <input type="checkbox" class="checkbox checkbox-secondary" />
+                            <input type="checkbox" class="checkbox checkbox-astami-blue" />
                             <span class="label-text text-sm">
                                 Voglio ricevere aggiornamenti e offerte speciali via email
                             </span>
@@ -103,7 +103,7 @@
                     </div>
 
                     <!-- Register Button -->
-                    <button id="registerSubmit" type="submit" class="btn btn-primary w-full mb-4">
+                    <button id="registerSubmit" type="submit" class="btn btn-astami-orange w-full mb-4">
                         <i class="fas fa-user-plus mr-2"></i>
                         Crea Account
                     </button>
@@ -140,7 +140,7 @@
             <div class="card-body text-center py-6">
                 <h3 class="text-lg font-bold mb-2">Sei un'agenzia immobiliare?</h3>
                 <p class="text-sm opacity-90 mb-4">Scopri i nostri piani business per digitalizzare la tua agenzia</p>
-                <button class="btn btn-outline btn-sm text-white border-white hover:bg-white hover:text-primary">
+                <button class="btn btn-outline btn-sm text-white border-white hover:bg-white hover:text-astami-orange">
                     <i class="fas fa-building mr-2"></i>
                     Registrazione Agenzia
                 </button>
@@ -151,7 +151,7 @@
         <div class="text-center text-sm text-base-content/70">
             <p>
                 Problemi con la registrazione?
-                <a href="#" class="link link-primary">Contatta il supporto</a>
+                <a href="#" class="link text-astami-orange">Contatta il supporto</a>
             </p>
         </div>
     </div>

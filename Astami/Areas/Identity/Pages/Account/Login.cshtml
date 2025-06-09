@@ -17,7 +17,7 @@
             </h2>
             <p class="mt-2 text-sm text-base-content/70">
                 Oppure
-                <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl" class="link link-primary font-medium">
+                <a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl" class="link text-astami-orange font-medium">
                     crea un nuovo account
                 </a>
             </p>
@@ -34,7 +34,7 @@
                         <label asp-for="Input.Email" class="label">
                             <span class="label-text font-medium">Email</span>
                         </label>
-                        <input asp-for="Input.Email" class="input input-bordered w-full @(ViewData.ModelState.ContainsKey("Input.Email") ? "" : "input-error")"
+                        <input asp-for="Input.Email" class="input border-astami-orange w-full @(ViewData.ModelState.ContainsKey("Input.Email") ? "" : "input-error")"
                                autocomplete="username" aria-required="true" placeholder="nome@esempio.com" />
                         <span asp-validation-for="Input.Email" class="label-text-alt text-error mt-1"></span>
                     </div>
@@ -45,7 +45,7 @@
                             <span class="label-text font-medium">Password</span>
                         </label>
                         <div class="relative">
-                            <input asp-for="Input.Password" type="password" class="input input-bordered w-full pr-10 @(ViewData.ModelState.ContainsKey("Input.Password") ? "" : "input-error")"
+                            <input asp-for="Input.Password" type="password" class="input border-astami-orange w-full pr-10 @(ViewData.ModelState.ContainsKey("Input.Password") ? "" : "input-error")"
                                    autocomplete="current-password" aria-required="true" placeholder="••••••••" />
                             <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center" onclick="togglePassword()">
                                 <i class="fas fa-eye text-base-content/50" id="passwordToggleIcon"></i>
@@ -57,13 +57,13 @@
                     <!-- Remember Me -->
                     <div class="form-control mb-6">
                         <label class="label cursor-pointer justify-start gap-3">
-                            <input asp-for="Input.RememberMe" type="checkbox" class="checkbox checkbox-primary" />
+                            <input asp-for="Input.RememberMe" type="checkbox" class="checkbox checkbox-astami-orange" />
                             <span class="label-text">@Html.DisplayNameFor(m => m.Input.RememberMe)</span>
                         </label>
                     </div>
 
                     <!-- Login Button -->
-                    <button id="login-submit" type="submit" class="btn btn-primary w-full mb-4">
+                    <button id="login-submit" type="submit" class="btn btn-astami-orange w-full mb-4">
                         <i class="fas fa-sign-in-alt mr-2"></i>
                         Accedi
                     </button>
@@ -71,13 +71,13 @@
                     <!-- Links -->
                     <div class="text-center space-y-2">
                         <div>
-                            <a id="forgot-password" asp-page="./ForgotPassword" class="link link-primary text-sm">
+                            <a id="forgot-password" asp-page="./ForgotPassword" class="link text-astami-orange text-sm">
                                 <i class="fas fa-question-circle mr-1"></i>
                                 Password dimenticata?
                             </a>
                         </div>
                         <div>
-                            <a id="resend-confirmation" asp-page="./ResendEmailConfirmation" class="link link-secondary text-sm">
+                            <a id="resend-confirmation" asp-page="./ResendEmailConfirmation" class="link text-astami-blue text-sm">
                                 <i class="fas fa-envelope mr-1"></i>
                                 Invia nuovamente email di conferma
                             </a>
@@ -115,7 +115,7 @@
         <div class="text-center text-sm text-base-content/70">
             <p>
                 Problemi con l'accesso?
-                <a href="#" class="link link-primary">Contatta il supporto</a>
+                <a href="#" class="link text-astami-orange">Contatta il supporto</a>
             </p>
         </div>
     </div>
