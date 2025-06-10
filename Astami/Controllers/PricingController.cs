@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using Astami.Data;
 using Astami.Models;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Authorization;
 
 namespace Astami.Controllers
 {

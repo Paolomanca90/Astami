@@ -4,7 +4,7 @@
     ViewData["Title"] = "Dashboard - " + Model.RagioneSociale;
 }
 
-<div class="min-h-screen bg-base-200">
+<div class="min-h-screen bg-base-200 pb-7">
     <!-- Header Dashboard -->
     <div class="gradient-bg text-white py-8">
         <div class="container mx-auto px-4">
@@ -346,7 +346,7 @@
                                 <div class="flex items-center justify-between">
                                     <div class="flex items-center space-x-3">
                                         <div class="avatar">
-                                            <div class="w-8 h-8 rounded-full bg-primary text-primary-content flex items-center justify-center text-sm">
+                                            <div class="w-8 h-8 rounded-full bg-primary text-primary-content flex items-center justify-center text-sm" style="display: flex;">
                                                 @membro.ApplicationUser.Nome?.FirstOrDefault()@membro.ApplicationUser.Cognome?.FirstOrDefault()
                                             </div>
                                         </div>

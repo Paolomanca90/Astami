@@ -46,12 +46,15 @@
             </div>
 
             <div class="navbar-end">
-                <div class="hidden lg:flex">
-                    <ul class="menu menu-horizontal px-1">
-                        <li><a asp-area="" asp-controller="Home" asp-action="Privacy" class="font-medium hover:text-astami-orange">Chi Siamo</a></li>
-                        <li><a asp-area="" asp-controller="Pricing" asp-action="Index" class="font-medium hover:text-astami-orange">Pricing</a></li>
-                    </ul>
-                </div>
+                @if (!User.Identity.IsAuthenticated)
+                {              
+                    <div class="hidden lg:flex">
+                        <ul class="menu menu-horizontal px-1">
+                            <li><a asp-area="" asp-controller="Home" asp-action="Privacy" class="font-medium hover:text-astami-orange">Chi Siamo</a></li>
+                            <li><a asp-area="" asp-controller="Pricing" asp-action="Index" class="font-medium hover:text-astami-orange">Pricing</a></li>
+                        </ul>
+                    </div>
+                }
 
                 <!-- Theme Toggle -->
                 <label class="btn btn-ghost btn-circle swap swap-rotate mr-2 hover:bg-astami-dark-orange hover:text-white hover:border-astami-dark-orange">

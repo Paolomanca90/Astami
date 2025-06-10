@@ -9,49 +9,75 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Astami.Controllers
 {
-	[Authorize]
 	public class AgencyController : Controller
 	{
 		private readonly ApplicationDbContext _context;
 		private readonly UserManager<ApplicationUser> _userManager;
 		private readonly RoleManager<IdentityRole> _roleManager;
+		private readonly SignInManager<ApplicationUser> _signInManager;
 
 		public AgencyController(
 			ApplicationDbContext context,
 			UserManager<ApplicationUser> userManager,
-			RoleManager<IdentityRole> roleManager)
+			RoleManager<IdentityRole> roleManager,
+			SignInManager<ApplicationUser> signInManager)
 		{
 			_context = context;
 			_userManager = userManager;
 			_roleManager = roleManager;
+			_signInManager = signInManager;
 		}
 
 		[AllowAnonymous]
 		[HttpGet]
-		public async Task<IActionResult> RegisterAgency()
+		public async Task<IActionResult> RegisterAgency(Guid? planId = null)
 		{
-			var user = await _userManager.GetUserAsync(User);
-			if (user != null)
-			{			
-				// Verifica se l'utente ha già un'agenzia
-				var agenziaEsistente = await _context.Agenzia
-					.FirstOrDefaultAsync(a => a.ApplicationUserId == user.Id);
-
-				if (agenziaEsistente != null)
+			// Se l'utente è già autenticato, verifica se ha già un'agenzia
+			if (User.Identity.IsAuthenticated)
+			{
+				var user = await _userManager.GetUserAsync(User);
+				if (user != null)
 				{
-					return RedirectToAction("Dashboard", "Agency");
+					var agenziaEsistente = await _context.Agenzia
+						.FirstOrDefaultAsync(a => a.ApplicationUserId == user.Id);
+
+					if (agenziaEsistente != null)
+					{
+						return RedirectToAction("Dashboard", "Agency");
+					}
 				}
 			}
 
 			var piani = await _context.Abbonamento.ToListAsync();
 
+			// Determina il piano selezionato
+			Abbonamento pianoSelezionato = null;
+
+			if (planId.HasValue)
+			{
+				pianoSelezionato = piani.FirstOrDefault(x => x.AbbonamentoId == planId.Value);
+			}
+			else if (TempData["PianoSelezionatoId"] != null && Guid.TryParse(TempData["PianoSelezionatoId"].ToString(), out Guid tempPlanId))
+			{
+				pianoSelezionato = piani.FirstOrDefault(x => x.AbbonamentoId == tempPlanId);
+			}
+
+			// Se non c'è un piano selezionato, usa il primo disponibile
+			pianoSelezionato ??= piani.FirstOrDefault();
+
 			var viewModel = new AgencyRegistrationViewModel
 			{
-				PianoSelezionato = piani.FirstOrDefault(x => x.AbbonamentoId == (Guid)TempData["PianoSelezionatoId"]),
-				AvailablePlans = piani
+				PianoSelezionato = pianoSelezionato,
+				AvailablePlans = piani,
+				AbbonamentoId = pianoSelezionato?.AbbonamentoId ?? Guid.Empty,
+				IsUserAuthenticated = User.Identity.IsAuthenticated
 			};
 
-			TempData["PianoSelezionatoId"] = viewModel.PianoSelezionato.AbbonamentoId;
+			// Mantieni il piano selezionato in TempData
+			if (pianoSelezionato != null)
+			{
+				TempData["PianoSelezionatoId"] = pianoSelezionato.AbbonamentoId;
+			}
 
 			return View(viewModel);
 		}
@@ -64,27 +90,88 @@ namespace Astami.Controllers
 			if (!ModelState.IsValid)
 			{
 				model.AvailablePlans = await _context.Abbonamento.ToListAsync();
+				model.IsUserAuthenticated = User.Identity.IsAuthenticated;
 				return View(model);
 			}
 
-			var user = await _userManager.GetUserAsync(User);
-			if (user == null)
+			ApplicationUser user = null;
+			bool isNewUser = false;
+
+			// Se l'utente non è autenticato, deve creare un nuovo account
+			if (!User.Identity.IsAuthenticated)
 			{
-				return Challenge();
+				// Verifica che i dati utente siano forniti
+				if (string.IsNullOrEmpty(model.UserEmail) || string.IsNullOrEmpty(model.UserPassword))
+				{
+					ModelState.AddModelError("", "Email e password sono obbligatori per creare un nuovo account.");
+					model.AvailablePlans = await _context.Abbonamento.ToListAsync();
+					model.IsUserAuthenticated = false;
+					return View(model);
+				}
+
+				// Verifica che l'email non sia già in uso
+				var existingUser = await _userManager.FindByEmailAsync(model.UserEmail);
+				if (existingUser != null)
+				{
+					ModelState.AddModelError("UserEmail", "Questa email è già registrata. Effettua il login prima di registrare l'agenzia.");
+					model.AvailablePlans = await _context.Abbonamento.ToListAsync();
+					model.IsUserAuthenticated = false;
+					return View(model);
+				}
+
+				// Crea nuovo utente
+				user = new ApplicationUser
+				{
+					UserName = model.UserEmail,
+					Email = model.UserEmail,
+					Nome = model.UserNome,
+					Cognome = model.UserCognome,
+					EmailConfirmed = true // Conferma automaticamente per semplificare
+				};
+
+				isNewUser = true;
 			}
-
-			// Verifica se l'utente ha già un'agenzia
-			var agenziaEsistente = await _context.Agenzia
-				.FirstOrDefaultAsync(a => a.ApplicationUserId == user.Id);
-
-			if (agenziaEsistente != null)
+			else
 			{
-				return RedirectToAction("Dashboard", "Agency");
+				// Utente già autenticato
+				user = await _userManager.GetUserAsync(User);
+				if (user == null)
+				{
+					return Challenge();
+				}
+
+				// Verifica se l'utente ha già un'agenzia
+				var agenziaEsistente = await _context.Agenzia
+					.FirstOrDefaultAsync(a => a.ApplicationUserId == user.Id);
+
+				if (agenziaEsistente != null)
+				{
+					return RedirectToAction("Dashboard", "Agency");
+				}
 			}
 
 			using var transaction = await _context.Database.BeginTransactionAsync();
 			try
 			{
+				// Se è un nuovo utente, crealo nel database
+				if (isNewUser)
+				{
+					var result = await _userManager.CreateAsync(user, model.UserPassword);
+					if (!result.Succeeded)
+					{
+						foreach (var error in result.Errors)
+						{
+							ModelState.AddModelError("", error.Description);
+						}
+						model.AvailablePlans = await _context.Abbonamento.ToListAsync();
+						model.IsUserAuthenticated = false;
+						return View(model);
+					}
+
+					// Assegna il ruolo Manager al nuovo utente
+					await _userManager.AddToRoleAsync(user, RolesConstants.Manager);
+				}
+
 				// Crea l'agenzia
 				var agenzia = new Agenzia
 				{
@@ -106,7 +193,7 @@ namespace Astami.Controllers
 					ApplicationUserId = user.Id,
 					ApplicationUser = user,
 					AbbonamentoId = model.AbbonamentoId,
-					Abbonamento = await _context.Abbonamento.FindAsync(model.AbbonamentoId),				
+					Abbonamento = await _context.Abbonamento.FindAsync(model.AbbonamentoId),
 					DataRegistrazione = DateTime.UtcNow,
 					IsActive = true
 				};
@@ -121,7 +208,7 @@ namespace Astami.Controllers
 					ApplicationUserId = user.Id,
 					Agenzia = agenzia,
 					ApplicationUser = user,
-					Ruolo = RolesConstants.Manager,
+					Ruolo = RolesConstants.Partner,
 					DataAssegnazione = DateTime.UtcNow,
 					IsActive = true
 				};
@@ -134,18 +221,14 @@ namespace Astami.Controllers
 					await _userManager.AddToRoleAsync(user, RolesConstants.Partner);
 				}
 
-				// Conferma il piano selezionato se presente
-				var pianoSelezionato = await _context.PianoSelezionato
-					.FirstOrDefaultAsync(p => p.ApplicationUserId == user.Id && !p.Confermato);
-
-				if (pianoSelezionato != null && pianoSelezionato.AbbonamentoId == model.AbbonamentoId)
-				{
-					pianoSelezionato.Confermato = true;
-					_context.Update(pianoSelezionato);
-				}
-
 				await _context.SaveChangesAsync();
 				await transaction.CommitAsync();
+
+				// Se è un nuovo utente, effettua il login automatico
+				if (isNewUser)
+				{
+					await _signInManager.SignInAsync(user, isPersistent: false);
+				}
 
 				TempData["SuccessMessage"] = "Agenzia registrata con successo! Benvenuto in ASTAMI.";
 				return RedirectToAction("Dashboard", "Agency");
@@ -155,11 +238,13 @@ namespace Astami.Controllers
 				await transaction.RollbackAsync();
 				ModelState.AddModelError("", "Si è verificato un errore durante la registrazione dell'agenzia. Riprova.");
 				model.AvailablePlans = await _context.Abbonamento.ToListAsync();
+				model.IsUserAuthenticated = User.Identity.IsAuthenticated;
 				return View(model);
 			}
 		}
 
 		[HttpGet]
+		[Authorize]
 		public async Task<IActionResult> Dashboard()
 		{
 			var user = await _userManager.GetUserAsync(User);
@@ -181,49 +266,23 @@ namespace Astami.Controllers
 				return RedirectToAction("RegisterAgency");
 			}
 
+			ViewBag.Nome = user.Nome + " " + user.Cognome;
 			return View(agenzia);
 		}
 
 		// Metodo per la selezione piano dalla registrazione agenzia
 		[HttpPost]
+		[AllowAnonymous]
 		public async Task<IActionResult> SelectPlanForAgency(Guid abbonamentoId)
 		{
-			var user = await _userManager.GetUserAsync(User);
-			if (user == null)
-			{
-				return Json(new { success = false, message = "Utente non autenticato" });
-			}
-
 			var abbonamento = await _context.Abbonamento.FindAsync(abbonamentoId);
 			if (abbonamento == null)
 			{
 				return Json(new { success = false, message = "Piano non trovato" });
 			}
 
-			// Aggiorna o crea la selezione del piano
-			var pianoEsistente = await _context.PianoSelezionato
-				.FirstOrDefaultAsync(p => p.ApplicationUserId == user.Id);
-
-			if (pianoEsistente != null)
-			{
-				pianoEsistente.AbbonamentoId = abbonamentoId;
-				pianoEsistente.Confermato = false;
-				_context.Update(pianoEsistente);
-			}
-			else
-			{
-				var nuovoPiano = new PianoSelezionato
-				{
-					PianoSelezionatoId = Guid.NewGuid(),
-					ApplicationUserId = user.Id,
-					AbbonamentoId = abbonamentoId,
-					Abbonamento = abbonamento,
-					Confermato = false
-				};
-				_context.PianoSelezionato.Add(nuovoPiano);
-			}
-
-			await _context.SaveChangesAsync();
+			// Salva la selezione del piano in TempData (funziona sia per utenti autenticati che non)
+			TempData["PianoSelezionatoId"] = abbonamentoId;
 
 			return Json(new
 			{
@@ -235,13 +294,33 @@ namespace Astami.Controllers
 		}
 	}
 
-	// ViewModel per la registrazione agenzia
+	// ViewModel aggiornato per la registrazione agenzia
 	public class AgencyRegistrationViewModel
 	{
-		public ApplicationUser User { get; set; }
-		public Abbonamento PianoSelezionato { get; set; }
+		public bool IsUserAuthenticated { get; set; }
+		public Abbonamento? PianoSelezionato { get; set; }
 		public List<Abbonamento> AvailablePlans { get; set; } = new List<Abbonamento>();
 
+		// Dati utente (per nuovi utenti)
+		[Required(ErrorMessage = "Il nome è obbligatorio")]
+		[StringLength(100, ErrorMessage = "Il nome non può superare i 100 caratteri")]
+		public string? UserNome { get; set; }
+
+		[Required(ErrorMessage = "Il cognome è obbligatorio")]
+		[StringLength(100, ErrorMessage = "Il cognome non può superare i 100 caratteri")]
+		public string? UserCognome { get; set; }
+
+		[Required(ErrorMessage = "L'email è obbligatoria")]
+		[EmailAddress(ErrorMessage = "Inserisci un indirizzo email valido")]
+		[StringLength(200, ErrorMessage = "L'email non può superare i 200 caratteri")]
+		public string? UserEmail { get; set; }
+
+		[Required(ErrorMessage = "La password è obbligatoria")]
+		[StringLength(100, ErrorMessage = "La password deve essere lunga almeno {2} caratteri.", MinimumLength = 6)]
+		[DataType(DataType.Password)]
+		public string? UserPassword { get; set; }
+
+		// Dati agenzia
 		[Required(ErrorMessage = "La ragione sociale è obbligatoria")]
 		[StringLength(200, ErrorMessage = "La ragione sociale non può superare i 200 caratteri")]
 		public string RagioneSociale { get; set; } = string.Empty;
@@ -270,10 +349,12 @@ namespace Astami.Controllers
 		[RegularExpression(@"^\d{5}$", ErrorMessage = "Il CAP deve essere composto da 5 cifre")]
 		public string CAP { get; set; } = string.Empty;
 
+		[Required(ErrorMessage = "Il telefono è obbligatorio")]
 		[StringLength(20, ErrorMessage = "Il telefono non può superare i 20 caratteri")]
 		[Phone(ErrorMessage = "Inserisci un numero di telefono valido")]
 		public string? Telefono { get; set; }
 
+		[Required(ErrorMessage = "L'email è obbligatoria")]
 		[StringLength(200, ErrorMessage = "L'email non può superare i 200 caratteri")]
 		[EmailAddress(ErrorMessage = "Inserisci un indirizzo email valido")]
 		public string? Email { get; set; }
@@ -282,10 +363,12 @@ namespace Astami.Controllers
 		[Url(ErrorMessage = "Inserisci un URL valido")]
 		public string? SitoWeb { get; set; }
 
-		[StringLength(20, ErrorMessage = "La Partita IVA non può superare i 20 caratteri")]
+		[Required(ErrorMessage = "La P.IVA è obbligatoria")]
+		[StringLength(20, ErrorMessage = "La P.IVA non può superare i 20 caratteri")]
 		[RegularExpression(@"^[0-9]{11}$", ErrorMessage = "La Partita IVA deve essere composta da 11 cifre")]
 		public string? PartitaIVA { get; set; }
 
+		[Required(ErrorMessage = "Lo SDI è obbligatorio")]
 		[StringLength(20, ErrorMessage = "Il codice SDI non può superare i 20 caratteri")]
 		public string? SDI { get; set; }
 

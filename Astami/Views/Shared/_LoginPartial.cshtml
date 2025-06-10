@@ -7,13 +7,13 @@
     <!-- User Menu quando è loggato -->
     <div class="dropdown dropdown-end">
         <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
-            <div class="w-10 rounded-full bg-astami-orange text-primary-content flex items-center justify-center">
+            <div class="w-10 rounded-full bg-astami-orange text-primary-content items-center justify-center" style="display: flex;">
                 <i class="fas fa-user"></i>
             </div>
         </div>
-        <ul tabindex="0" class="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow-lg border">
+        <ul tabindex="0" class="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-60 p-2 shadow-lg border text-gray-500 dark:text-gray-300">
             <li class="menu-title">
-                <span>Ciao, @(User.Identity?.Name ?? "Utente")!</span>
+                <span>Ciao, @(ViewBag.Nome ?? "Utente")</span>
             </li>
             <li>
                 <a asp-area="Identity" asp-page="/Account/Manage/Index" class="font-medium">
@@ -43,7 +43,7 @@
             <div class="divider my-1"></div>
             <li>
                 <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" method="post" class="w-full">
-                    <button type="submit" class="w-full text-left font-medium text-error hover:bg-error/10">
+                    <button type="submit" class="w-full text-left font-medium text-error cursor-pointer">
                         <i class="fas fa-sign-out-alt mr-2"></i>
                         Logout
                     </button>
