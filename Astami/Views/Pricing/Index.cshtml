@@ -1,0 +1,301 @@
+﻿@model IEnumerable<Astami.Models.Abbonamento>
+
+@{
+    ViewData["Title"] = "Pricing - Scegli il tuo piano";
+}
+
+<!-- Hero Section Pricing -->
+<div class="hero gradient-bg text-white py-20">
+    <div class="hero-content text-center">
+        <div class="max-w-4xl">
+            <h1 class="text-5xl font-bold mb-6">
+                Scegli il piano perfetto per la tua <span class="text-astami-orange">agenzia</span>
+            </h1>
+            <p class="text-xl mb-8 opacity-90">
+                Digitalizza la tua agenzia immobiliare con ASTAMI. Piani flessibili per ogni esigenza.
+            </p>
+            <div class="flex justify-center items-center gap-4 mb-8">
+                <span class="text-white/80">Mensile</span>
+                <input type="checkbox" class="toggle toggle-lg input-astami-orange" id="billingToggle" />
+                <span class="text-white/80">Annuale <span class="badge badge-success badge-sm">-20%</span></span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Pricing Cards -->
+<section class="py-20 bg-base-100" id="plans">
+    <div class="container mx-auto px-4">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+
+            @foreach (var abbonamento in Model)
+            {
+                <div class="card bg-base-100 shadow-xl card-hover @(abbonamento.Nome == "PRO" ? "border-2 border-astami-orange relative" : "")">
+                    @if (abbonamento.Nome == "PRO")
+                    {
+                        <div class="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                            <div class="badge badge-lg bg-astami-orange text-white border-none px-6 py-3 font-bold">PIÙ POPOLARE</div>
+                        </div>
+                    }
+
+                    <div class="card-body p-8 text-center">
+                        <!-- Piano Nome -->
+                        <h3 class="text-2xl font-bold mb-2 @(abbonamento.Nome == "Basic" ? "text-astami-blue" : abbonamento.Nome == "PRO" ? "text-astami-orange" : "text-primary")">
+                            @abbonamento.Nome
+                        </h3>
+
+                        <!-- Prezzo -->
+                        <div class="mb-6">
+                            <div class="text-5xl font-bold @(abbonamento.Nome == "Basic" ? "text-astami-blue" : abbonamento.Nome == "PRO" ? "text-astami-orange" : "text-primary")">
+                                €<span class="monthly-price">@abbonamento.Prezzo.ToString("0")</span>
+                                <span class="yearly-price hidden">@((abbonamento.Prezzo * 12 * 0.8m).ToString("0"))</span>
+                            </div>
+                            <div class="text-base-content/70">
+                                /<span class="billing-period">mese</span>
+                            </div>
+                            <div class="yearly-savings hidden text-success text-sm font-medium mt-1">
+                                Risparmi €@((abbonamento.Prezzo * 12 * 0.2m).ToString("0")) all'anno
+                            </div>
+                        </div>
+
+                        <!-- Descrizione -->
+                        <p class="text-base-content/80 mb-6 leading-relaxed min-h-[80px]">
+                            @abbonamento.Descrizione
+                        </p>
+
+                        <!-- Features List -->
+                        <div class="space-y-3 mb-8 text-left">
+                            @if (abbonamento.Nome == "Basic")
+                            {
+                                <div class="flex items-center">
+                                    <i class="fas fa-check text-success mr-3"></i>
+                                    <span>Dashboard gestionale privata</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fas fa-check text-success mr-3"></i>
+                                    <span>Caricamento e gestione immobili</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fas fa-check text-success mr-3"></i>
+                                    <span>Accesso clienti con richieste digitali</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fas fa-check text-success mr-3"></i>
+                                    <span>Notifiche automatiche e report base</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fas fa-check text-success mr-3"></i>
+                                    <span>Fino a 50 immobili</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fas fa-check text-success mr-3"></i>
+                                    <span>Supporto email</span>
+                                </div>
+                            }
+                            else if (abbonamento.Nome == "PRO")
+                            {
+                                <div class="flex items-center">
+                                    <i class="fas fa-check text-success mr-3"></i>
+                                    <span><strong>Tutto del piano Basic</strong></span>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fas fa-check text-success mr-3"></i>
+                                    <span>Offerte libere digitalizzate</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fas fa-check text-success mr-3"></i>
+                                    <span>Personalizzazione tempistiche</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fas fa-check text-success mr-3"></i>
+                                    <span>Notifiche smart per clienti e agenti</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fas fa-check text-success mr-3"></i>
+                                    <span>Report avanzati sulle performance</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fas fa-check text-success mr-3"></i>
+                                    <span>Immobili illimitati</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fas fa-check text-success mr-3"></i>
+                                    <span>Supporto prioritario</span>
+                                </div>
+                            }
+                            else if (abbonamento.Nome == "Enterprise")
+                            {
+                                <div class="flex items-center">
+                                    <i class="fas fa-check text-success mr-3"></i>
+                                    <span><strong>Tutto del piano Pro</strong></span>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fas fa-check text-success mr-3"></i>
+                                    <span>Firma digitale e gestione contratti</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fas fa-check text-success mr-3"></i>
+                                    <span>Pagamenti e transazioni online</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fas fa-check text-success mr-3"></i>
+                                    <span>Integrazione con CRM e portali immobiliari</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fas fa-check text-success mr-3"></i>
+                                    <span>API personalizzate</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fas fa-check text-success mr-3"></i>
+                                    <span>Account manager dedicato</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fas fa-check text-success mr-3"></i>
+                                    <span>Supporto premium 24/7</span>
+                                </div>
+                            }
+                        </div>
+
+                        <!-- CTA Button -->
+                        <form method="post" asp-action="SelectPlan" asp-controller="Pricing">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="abbonamentoId" value="@abbonamento.AbbonamentoId" />
+                            <button type="submit" class="btn w-full btn-lg @(abbonamento.Nome == "Basic" ? "btn-astami-blue" : abbonamento.Nome == "PRO" ? "btn-astami-orange" : "btn-primary") btn-animate">
+                                    <i class="fas fa-rocket mr-2"></i>
+                                    Inizia Ora
+                            </button>
+                        </form>
+                        
+                        <p class="text-xs text-base-content/60 mt-3">
+                            <i class="fas fa-shield-alt mr-1"></i>
+                            Prova gratuita di 14 giorni • Nessun impegno
+                        </p>
+                        
+                    </div>
+                </div>
+            }
+        </div>
+
+        <!-- Trust Indicators -->
+        <div class="text-center mt-16">
+            <div class="max-w-4xl mx-auto">
+                <h3 class="text-2xl font-bold mb-8">Oltre 250+ agenzie si affidano a ASTAMI</h3>
+                <div class="grid grid-cols-3 md:grid-cols-6 gap-8 items-center opacity-60">
+                    <div class="flex items-center justify-center">
+                        <i class="fas fa-building text-2xl"></i>
+                    </div>
+                    <div class="flex items-center justify-center">
+                        <i class="fas fa-home text-2xl"></i>
+                    </div>
+                    <div class="flex items-center justify-center">
+                        <i class="fas fa-city text-2xl"></i>
+                    </div>
+                    <div class="flex items-center justify-center">
+                        <i class="fas fa-landmark text-2xl"></i>
+                    </div>
+                    <div class="flex items-center justify-center">
+                        <i class="fas fa-store text-2xl"></i>
+                    </div>
+                    <div class="flex items-center justify-center">
+                        <i class="fas fa-warehouse text-2xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- FAQ Section -->
+<section class="py-20 bg-base-200">
+    <div class="container mx-auto px-4">
+        <div class="max-w-4xl mx-auto">
+            <h2 class="text-4xl font-bold text-center mb-16">Domande frequenti</h2>
+
+            <div class="space-y-4">
+                <div class="collapse collapse-plus bg-base-100 shadow">
+                    <input type="radio" name="faq-accordion" />
+                    <div class="collapse-title text-xl font-medium">
+                        Posso cambiare piano in qualsiasi momento?
+                    </div>
+                    <div class="collapse-content">
+                        <p>Sì, puoi aggiornare o ridurre il tuo piano in qualsiasi momento. Le modifiche verranno applicate al prossimo ciclo di fatturazione.</p>
+                    </div>
+                </div>
+
+                <div class="collapse collapse-plus bg-base-100 shadow">
+                    <input type="radio" name="faq-accordion" />
+                    <div class="collapse-title text-xl font-medium">
+                        È inclusa la prova gratuita?
+                    </div>
+                    <div class="collapse-content">
+                        <p>Sì, tutti i piani includono una prova gratuita di 14 giorni. Non ti chiederemo la carta di credito durante la registrazione.</p>
+                    </div>
+                </div>
+
+                <div class="collapse collapse-plus bg-base-100 shadow">
+                    <input type="radio" name="faq-accordion" />
+                    <div class="collapse-title text-xl font-medium">
+                        Cosa include il supporto?
+                    </div>
+                    <div class="collapse-content">
+                        <p>Il piano Basic include supporto via email, il Pro supporto prioritario, mentre Enterprise ha un account manager dedicato e supporto 24/7.</p>
+                    </div>
+                </div>
+
+                <div class="collapse collapse-plus bg-base-100 shadow">
+                    <input type="radio" name="faq-accordion" />
+                    <div class="collapse-title text-xl font-medium">
+                        Posso annullare in qualsiasi momento?
+                    </div>
+                    <div class="collapse-content">
+                        <p>Assolutamente sì. Non ci sono contratti vincolanti. Puoi annullare il tuo abbonamento in qualsiasi momento dal tuo account.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Final -->
+<section class="py-20 gradient-bg text-white">
+    <div class="container mx-auto px-4 text-center">
+        <h2 class="text-4xl font-bold mb-6">
+            Pronto a digitalizzare la tua agenzia?
+        </h2>
+        <p class="text-xl mb-8 opacity-90 max-w-3xl mx-auto">
+            Unisciti a centinaia di agenzie che hanno già scelto ASTAMI per modernizzare il loro business immobiliare.
+        </p>
+        <div class="flex justify-center">
+            <a href="#plans" class="btn btn-astami-orange btn-lg px-8 btn-animate shadow-astami-dark-orange">
+                <i class="fas fa-rocket mr-2"></i>
+                Inizia Subito
+            </a>
+        </div>
+    </div>
+</section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const billingToggle = document.getElementById('billingToggle');
+        const monthlyPrices = document.querySelectorAll('.monthly-price');
+        const yearlyPrices = document.querySelectorAll('.yearly-price');
+        const billingPeriods = document.querySelectorAll('.billing-period');
+        const yearlySavings = document.querySelectorAll('.yearly-savings');
+
+        billingToggle.addEventListener('change', function() {
+            if (this.checked) {
+                // Passa ad annuale
+                monthlyPrices.forEach(el => el.classList.add('hidden'));
+                yearlyPrices.forEach(el => el.classList.remove('hidden'));
+                billingPeriods.forEach(el => el.textContent = 'anno');
+                yearlySavings.forEach(el => el.classList.remove('hidden'));
+            } else {
+                // Passa a mensile
+                monthlyPrices.forEach(el => el.classList.remove('hidden'));
+                yearlyPrices.forEach(el => el.classList.add('hidden'));
+                billingPeriods.forEach(el => el.textContent = 'mese');
+                yearlySavings.forEach(el => el.classList.add('hidden'));
+            }
+        });
+    });
+</script>

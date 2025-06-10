@@ -1,0 +1,437 @@
+﻿@model Astami.Models.Agenzia
+
+@{
+    ViewData["Title"] = "Dashboard - " + Model.RagioneSociale;
+}
+
+<div class="min-h-screen bg-base-200">
+    <!-- Header Dashboard -->
+    <div class="gradient-bg text-white py-8">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold mb-2">
+                        Benvenuto, @Model.RagioneSociale
+                    </h1>
+                    <p class="text-white/80">
+                        <i class="fas fa-map-marker-alt mr-2"></i>
+                        @Model.Città, @Model.Provincia
+                    </p>
+                </div>
+                <div class="mt-4 lg:mt-0">
+                    <div class="flex items-center gap-4">
+                        <div class="badge badge-lg @(Model.Abbonamento?.Nome == "Basic" ? "badge-info" : Model.Abbonamento?.Nome == "PRO" ? "badge-warning" : "badge-success") border-none">
+                            Piano @Model.Abbonamento?.Nome
+                        </div>
+                        <div class="dropdown dropdown-end">
+                            <div tabindex="0" role="button" class="btn btn-ghost btn-circle">
+                                <i class="fas fa-cog text-xl"></i>
+                            </div>
+                            <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow-lg text-base-content">
+                                <li><a href="#"><i class="fas fa-edit mr-2"></i>Modifica Agenzia</a></li>
+                                <li><a href="#"><i class="fas fa-users mr-2"></i>Gestisci Team</a></li>
+                                <li><a href="#"><i class="fas fa-credit-card mr-2"></i>Fatturazione</a></li>
+                                <li><a href="#"><i class="fas fa-chart-line mr-2"></i>Upgrade Piano</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="container mx-auto px-4 -mt-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <!-- Immobili -->
+            <div class="card bg-base-100 shadow-xl">
+                <div class="card-body p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-sm font-medium text-base-content/70">Immobili Attivi</h3>
+                            <p class="text-3xl font-bold text-astami-blue">@Model.Immobili.Count(i => i.IsPublished)</p>
+                        </div>
+                        <div class="w-12 h-12 bg-astami-blue/10 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-home text-astami-blue text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="mt-2 text-sm text-success">
+                        <i class="fas fa-arrow-up mr-1"></i>
+                        +@Model.Immobili.Count(i => i.DataCreazione >= DateTime.Now.AddDays(-30)) questo mese
+                    </div>
+                </div>
+            </div>
+
+            <!-- Leads -->
+            <div class="card bg-base-100 shadow-xl">
+                <div class="card-body p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-sm font-medium text-base-content/70">Nuovi Lead</h3>
+                            <p class="text-3xl font-bold text-astami-orange">@Model.Leads.Count(l => l.Stato == Astami.Utilities.Enum.StatoLead.Nuovo)</p>
+                        </div>
+                        <div class="w-12 h-12 bg-astami-orange/10 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-users text-astami-orange text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="mt-2 text-sm text-success">
+                        <i class="fas fa-arrow-up mr-1"></i>
+                        +@Model.Leads.Count(l => l.DataCreazione >= DateTime.Now.AddDays(-7)) questa settimana
+                    </div>
+                </div>
+            </div>
+
+            <!-- Aste Attive -->
+            <div class="card bg-base-100 shadow-xl">
+                <div class="card-body p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-sm font-medium text-base-content/70">Aste Attive</h3>
+                            <p class="text-3xl font-bold text-success">@Model.Immobili.SelectMany(i => i.Aste).Count(a => a.Stato == Astami.Utilities.Enum.StatoAsta.Attiva)</p>
+                        </div>
+                        <div class="w-12 h-12 bg-success/10 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-gavel text-success text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="mt-2 text-sm text-base-content/70">
+                        <i class="fas fa-clock mr-1"></i>
+                        In corso ora
+                    </div>
+                </div>
+            </div>
+
+            <!-- Team -->
+            <div class="card bg-base-100 shadow-xl">
+                <div class="card-body p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-sm font-medium text-base-content/70">Membri Team</h3>
+                            <p class="text-3xl font-bold text-primary">@Model.AgenziaUtenti.Count(au => au.IsActive)</p>
+                        </div>
+                        <div class="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-user-tie text-primary text-xl"></i>
+                        </div>
+                    </div>
+                    <div class="mt-2 text-sm text-base-content/70">
+                        <i class="fas fa-user-plus mr-1"></i>
+                        Attivi
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+            <!-- Left Column -->
+            <div class="lg:col-span-2 space-y-8">
+
+                <!-- Quick Actions -->
+                <div class="card bg-base-100 shadow-xl">
+                    <div class="card-body p-6">
+                        <h2 class="card-title text-xl mb-6">
+                            <i class="fas fa-rocket text-astami-orange mr-2"></i>
+                            Azioni Rapide
+                        </h2>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <a href="#" class="btn btn-outline btn-astami-blue flex-col h-20 gap-2">
+                                <i class="fas fa-plus text-lg"></i>
+                                <span class="text-xs">Nuovo Immobile</span>
+                            </a>
+                            <a href="#" class="btn btn-outline btn-astami-orange flex-col h-20 gap-2">
+                                <i class="fas fa-gavel text-lg"></i>
+                                <span class="text-xs">Crea Asta</span>
+                            </a>
+                            <a href="#" class="btn btn-outline btn-success flex-col h-20 gap-2">
+                                <i class="fas fa-users text-lg"></i>
+                                <span class="text-xs">Gestisci Lead</span>
+                            </a>
+                            <a href="#" class="btn btn-outline btn-info flex-col h-20 gap-2">
+                                <i class="fas fa-calendar text-lg"></i>
+                                <span class="text-xs">Appuntamenti</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Properties -->
+                <div class="card bg-base-100 shadow-xl">
+                    <div class="card-body p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <h2 class="card-title text-xl">
+                                <i class="fas fa-home text-astami-blue mr-2"></i>
+                                Immobili Recenti
+                            </h2>
+                            <a href="#" class="btn btn-sm btn-ghost text-astami-orange">
+                                Vedi tutti <i class="fas fa-arrow-right ml-1"></i>
+                            </a>
+                        </div>
+
+                        @if (Model.Immobili.Any())
+                        {
+                            <div class="space-y-4">
+                                @foreach (var immobile in Model.Immobili.OrderByDescending(i => i.DataCreazione).Take(3))
+                                {
+                                    <div class="flex items-center justify-between p-4 border border-base-300 rounded-lg hover:border-astami-orange transition-colors">
+                                        <div class="flex items-center space-x-4">
+                                            <div class="w-16 h-16 bg-base-200 rounded-lg flex items-center justify-center">
+                                                @if (immobile.Immagini.Any())
+                                                {
+                                                    <img src="@immobile.Immagini.FirstOrDefault(i => i.IsPrimary)?.Url"
+                                                         alt="@immobile.Titolo" class="w-full h-full object-cover rounded-lg" />
+                                                }
+                                                else
+                                                {
+                                                    <i class="fas fa-image text-base-content/50"></i>
+                                                }
+                                            </div>
+                                            <div>
+                                                <h3 class="font-bold">@immobile.Titolo</h3>
+                                                <p class="text-sm text-base-content/70">@immobile.Città, @immobile.Provincia</p>
+                                                <div class="flex items-center gap-2 mt-1">
+                                                    <span class="badge badge-sm @(immobile.TipoContratto == Astami.Utilities.Enum.TipoContratto.Affitto ? "badge-info" : "badge-success")">
+                                                        @(immobile.TipoContratto == Astami.Utilities.Enum.TipoContratto.Affitto ? "Affitto" : "Vendita")
+                                                    </span>
+                                                    <span class="badge badge-sm badge-outline">@immobile.TipoImmobile</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="text-right">
+                                            <div class="text-lg font-bold text-astami-orange">€@immobile.PrezzoBase.ToString("N0")</div>
+                                            <div class="text-sm text-base-content/70">
+                                                @(immobile.TipoContratto == Astami.Utilities.Enum.TipoContratto.Affitto ? "/mese" : "")
+                                            </div>
+                                            <div class="mt-2">
+                                                <span class="badge badge-sm @(immobile.IsPublished ? "badge-success" : "badge-warning")">
+                                                    @(immobile.IsPublished ? "Pubblicato" : "Bozza")
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="text-center py-12">
+                                <i class="fas fa-home text-4xl text-base-content/30 mb-4"></i>
+                                <h3 class="text-lg font-bold mb-2">Nessun immobile ancora</h3>
+                                <p class="text-base-content/70 mb-6">Inizia aggiungendo il tuo primo immobile</p>
+                                <a href="#" class="btn btn-astami-blue">
+                                    <i class="fas fa-plus mr-2"></i>
+                                    Aggiungi Immobile
+                                </a>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="card bg-base-100 shadow-xl">
+                    <div class="card-body p-6">
+                        <h2 class="card-title text-xl mb-6">
+                            <i class="fas fa-clock text-info mr-2"></i>
+                            Attività Recenti
+                        </h2>
+                        <div class="space-y-4">
+                            <div class="flex items-start space-x-3">
+                                <div class="w-2 h-2 bg-success rounded-full mt-2"></div>
+                                <div>
+                                    <p class="font-medium">Nuovo lead ricevuto</p>
+                                    <p class="text-sm text-base-content/70">Mario Rossi interessato a Villa in centro</p>
+                                    <p class="text-xs text-base-content/50">2 ore fa</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start space-x-3">
+                                <div class="w-2 h-2 bg-astami-orange rounded-full mt-2"></div>
+                                <div>
+                                    <p class="font-medium">Asta conclusa</p>
+                                    <p class="text-sm text-base-content/70">Appartamento Via Roma venduto per €280.000</p>
+                                    <p class="text-xs text-base-content/50">5 ore fa</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start space-x-3">
+                                <div class="w-2 h-2 bg-info rounded-full mt-2"></div>
+                                <div>
+                                    <p class="font-medium">Appuntamento programmato</p>
+                                    <p class="text-sm text-base-content/70">Visita immobile con cliente</p>
+                                    <p class="text-xs text-base-content/50">1 giorno fa</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-6">
+                            <a href="#" class="btn btn-sm btn-outline w-full">
+                                Vedi tutte le attività
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="space-y-8">
+
+                <!-- Plan Info -->
+                <div class="card bg-gradient-to-br from-astami-blue to-astami-light-blue text-white shadow-xl">
+                    <div class="card-body p-6">
+                        <h3 class="card-title text-lg mb-4">
+                            <i class="fas fa-crown mr-2"></i>
+                            Piano @Model.Abbonamento?.Nome
+                        </h3>
+                        <div class="space-y-3">
+                            @if (Model.Abbonamento?.Nome == "Basic")
+                            {
+                                <div class="flex items-center justify-between">
+                                    <span>Immobili</span>
+                                    <span>@Model.Immobili.Count / 50</span>
+                                </div>
+                                <div class="progress bg-white/20">
+                                    <div class="progress-value bg-white" style="width: @(Model.Immobili.Count * 100 / 50)%"></div>
+                                </div>
+                            }
+                            else if (Model.Abbonamento?.Nome == "PRO")
+                            {
+                                <div class="flex items-center justify-between">
+                                    <span>Immobili</span>
+                                    <span>@Model.Immobili.Count / ∞</span>
+                                </div>
+                                <div class="flex items-center text-sm">
+                                    <i class="fas fa-check mr-2"></i>
+                                    Immobili illimitati
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="flex items-center text-sm">
+                                    <i class="fas fa-star mr-2"></i>
+                                    Tutte le funzionalità premium
+                                </div>
+                            }
+                        </div>
+                        <div class="mt-6">
+                            @if (Model.Abbonamento?.Nome == "Basic")
+                            {
+                                <a href="@Url.Action("Index", "Pricing")" class="btn btn-white text-astami-blue btn-sm w-full">
+                                    <i class="fas fa-arrow-up mr-2"></i>
+                                    Upgrade a PRO
+                                </a>
+                            }
+                            else
+                            {
+                                <div class="text-center text-sm opacity-90">
+                                    <i class="fas fa-check-circle mr-1"></i>
+                                    Piano attivo
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Team Members -->
+                <div class="card bg-base-100 shadow-xl">
+                    <div class="card-body p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="card-title text-lg">
+                                <i class="fas fa-users text-primary mr-2"></i>
+                                Team
+                            </h3>
+                            <a href="#" class="btn btn-sm btn-ghost text-primary">
+                                <i class="fas fa-user-plus mr-1"></i>
+                                Invita
+                            </a>
+                        </div>
+                        <div class="space-y-3">
+                            @foreach (var membro in Model.AgenziaUtenti.Where(au => au.IsActive).Take(5))
+                            {
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="avatar">
+                                            <div class="w-8 h-8 rounded-full bg-primary text-primary-content flex items-center justify-center text-sm">
+                                                @membro.ApplicationUser.Nome?.FirstOrDefault()@membro.ApplicationUser.Cognome?.FirstOrDefault()
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <p class="font-medium text-sm">@membro.ApplicationUser.Nome @membro.ApplicationUser.Cognome</p>
+                                            <p class="text-xs text-base-content/70">@membro.Ruolo</p>
+                                        </div>
+                                    </div>
+                                    <div class="badge badge-sm badge-success">Attivo</div>
+                                </div>
+                            }
+                        </div>
+                        @if (Model.AgenziaUtenti.Count(au => au.IsActive) > 5)
+                        {
+                            <div class="mt-4 text-center">
+                                <a href="#" class="btn btn-sm btn-outline w-full">
+                                    Vedi tutti (@Model.AgenziaUtenti.Count(au => au.IsActive))
+                                </a>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Quick Stats -->
+                <div class="card bg-base-100 shadow-xl">
+                    <div class="card-body p-6">
+                        <h3 class="card-title text-lg mb-6">
+                            <i class="fas fa-chart-pie text-success mr-2"></i>
+                            Statistiche Rapide
+                        </h3>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm">Tasso di conversione</span>
+                                <span class="font-bold text-success">
+                                    @{
+                                        var totalLeads = Model.Leads.Count();
+                                        var convertedLeads = Model.Leads.Count(l => l.Stato == Astami.Utilities.Enum.StatoLead.Convertito);
+                                        var conversionRate = totalLeads > 0 ? (convertedLeads * 100 / totalLeads) : 0;
+                                    }
+                                    @conversionRate%
+                                </span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm">Tempo medio risposta</span>
+                                <span class="font-bold text-info">2.5h</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm">Soddisfazione clienti</span>
+                                <span class="font-bold text-warning">4.8/5</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Support -->
+                <div class="card bg-info/10 border border-info/20 shadow-xl">
+                    <div class="card-body p-6 text-center">
+                        <i class="fas fa-headset text-3xl text-info mb-4"></i>
+                        <h3 class="font-bold text-lg mb-2">Serve aiuto?</h3>
+                        <p class="text-sm text-base-content/70 mb-4">
+                            Il nostro team di supporto è qui per aiutarti
+                        </p>
+                        <div class="space-y-2">
+                            <a href="#" class="btn btn-info btn-sm w-full">
+                                <i class="fas fa-comments mr-2"></i>
+                                Chat dal vivo
+                            </a>
+                            <a href="#" class="btn btn-outline btn-sm w-full">
+                                <i class="fas fa-book mr-2"></i>
+                                Centro assistenza
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="toast toast-end">
+        <div class="alert alert-success">
+            <i class="fas fa-check-circle"></i>
+            <span>@TempData["SuccessMessage"]</span>
+        </div>
+    </div>
+}

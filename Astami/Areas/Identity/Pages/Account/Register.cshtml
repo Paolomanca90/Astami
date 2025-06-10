@@ -5,10 +5,10 @@
 }
 
 <div class="min-h-screen flex items-center justify-center bg-base-200 py-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-md w-full space-y-8">
+    <div class="max-w-5xl w-full space-y-8">
         <!-- Header -->
         <div class="text-center">
-            <div class="w-2/3 mx-auto mb-3 gradient-bg rounded-lg">
+            <div class="w-[20em] mx-auto mb-3 gradient-bg rounded-lg">
                 <img src="/img/logo_astami.png" class="w-full" alt="logo" />
             </div>
             <h2 class="text-2xl font-bold text-base-content">
@@ -22,92 +22,156 @@
             </p>
         </div>
 
-        <!-- Registration Form -->
-        <div class="card bg-base-100 shadow-xl">
-            <div class="card-body">
-                <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
-                    <div asp-validation-summary="ModelOnly" class="alert alert-error mb-4" role="alert" style="@(ViewData.ModelState.IsValid ? "display: none;" : "")"></div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+            <!-- Registration Form -->
+            <div class="card bg-base-100 shadow-xl">
+                <div class="card-body">
+                    <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-error mb-4" role="alert" style="@(ViewData.ModelState.IsValid ? "display: none;" : "")"></div>
 
-                    <!-- Email Field -->
-                    <div class="form-control mb-4">
-                        <label asp-for="Input.Email" class="label">
-                            <span class="label-text font-medium">Email</span>
-                        </label>
-                        <input asp-for="Input.Email" class="input border-astami-orange w-full @(ViewData.ModelState.ContainsKey("Input.Email") ? "" : "input-error")"
-                               autocomplete="username" aria-required="true" placeholder="nome@esempio.com" />
-                        <span asp-validation-for="Input.Email" class="label-text-alt text-error mt-1"></span>
-                    </div>
-
-                    <!-- Password Field -->
-                    <div class="form-control mb-4">
-                        <label asp-for="Input.Password" class="label">
-                            <span class="label-text font-medium">Password</span>
-                        </label>
-                        <div class="relative">
-                            <input asp-for="Input.Password" type="password" class="input border-astami-orange w-full pr-10 @(ViewData.ModelState.ContainsKey("Input.Password") ? "" : "input-error")"
-                                   autocomplete="new-password" aria-required="true" placeholder="••••••••" />
-                            <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center" onclick="togglePassword('Input.Password')">
-                                <i class="fas fa-eye text-base-content/50" id="passwordToggleIcon"></i>
-                            </button>
+                        <!-- Email Field -->
+                        <div class="form-control mb-4">
+                            <label asp-for="Input.Email" class="label">
+                                <span class="label-text font-medium">Email</span>
+                            </label>
+                            <input asp-for="Input.Email" class="input border-astami-orange w-full @(ViewData.ModelState.ContainsKey("Input.Email") ? "" : "input-error")"
+                                   autocomplete="username" aria-required="true" placeholder="nome@esempio.com" />
+                            <span asp-validation-for="Input.Email" class="label-text-alt text-error mt-1"></span>
                         </div>
-                        <span asp-validation-for="Input.Password" class="label-text-alt text-error mt-1"></span>
 
-                        <!-- Password Requirements -->
-                        <div class="mt-2 text-xs text-base-content/60">
-                            <div class="grid grid-cols-1 gap-1">
-                                <div class="flex items-center">
-                                    <i class="fas fa-check text-success mr-2" id="length-check" style="display: none;"></i>
-                                    <i class="fas fa-times text-astami-dark-orange mr-2" id="length-cross"></i>
-                                    <span>Almeno 6 caratteri</span>
+                        <!-- Password Field -->
+                        <div class="form-control mb-4">
+                            <label asp-for="Input.Password" class="label">
+                                <span class="label-text font-medium">Password</span>
+                            </label>
+                            <div class="relative">
+                                <input asp-for="Input.Password" type="password" class="input border-astami-orange w-full pr-10 @(ViewData.ModelState.ContainsKey("Input.Password") ? "" : "input-error")"
+                                       autocomplete="new-password" aria-required="true" placeholder="••••••••" />
+                                <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center" onclick="togglePassword('Input.Password')">
+                                    <i class="fas fa-eye text-base-content/50" id="passwordToggleIcon"></i>
+                                </button>
+                            </div>
+                            <span asp-validation-for="Input.Password" class="label-text-alt text-error mt-1"></span>
+
+                            <!-- Password Requirements -->
+                            <div class="mt-2 text-xs text-base-content/60">
+                                <div class="grid grid-cols-1 gap-1">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-check text-success mr-2" id="length-check" style="display: none;"></i>
+                                        <i class="fas fa-times text-astami-dark-orange mr-2" id="length-cross"></i>
+                                        <span>Almeno 6 caratteri</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Confirm Password Field -->
-                    <div class="form-control mb-6">
-                        <label asp-for="Input.ConfirmPassword" class="label">
-                            <span class="label-text font-medium">Conferma Password</span>
-                        </label>
-                        <div class="relative">
-                            <input asp-for="Input.ConfirmPassword" type="password" class="input border-astami-orange w-full pr-10 @(ViewData.ModelState.ContainsKey("Input.ConfirmPassword") ? "" : "input-error")"
-                                   autocomplete="new-password" aria-required="true" placeholder="••••••••" />
-                            <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center" onclick="togglePassword('Input.ConfirmPassword')">
-                                <i class="fas fa-eye text-base-content/50" id="confirmPasswordToggleIcon"></i>
-                            </button>
+                        <!-- Confirm Password Field -->
+                        <div class="form-control mb-6">
+                            <label asp-for="Input.ConfirmPassword" class="label">
+                                <span class="label-text font-medium">Conferma Password</span>
+                            </label>
+                            <div class="relative">
+                                <input asp-for="Input.ConfirmPassword" type="password" class="input border-astami-orange w-full pr-10 @(ViewData.ModelState.ContainsKey("Input.ConfirmPassword") ? "" : "input-error")"
+                                       autocomplete="new-password" aria-required="true" placeholder="••••••••" />
+                                <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center" onclick="togglePassword('Input.ConfirmPassword')">
+                                    <i class="fas fa-eye text-base-content/50" id="confirmPasswordToggleIcon"></i>
+                                </button>
+                            </div>
+                            <span asp-validation-for="Input.ConfirmPassword" class="label-text-alt text-error mt-1"></span>
                         </div>
-                        <span asp-validation-for="Input.ConfirmPassword" class="label-text-alt text-error mt-1"></span>
+
+                        <!-- Terms and Conditions -->
+                        <div class="form-control mb-6">
+                            <label class="label cursor-pointer justify-start gap-3">
+                                <input type="checkbox" class="checkbox checkbox-astami-orange" required />
+                                <span class="label-text text-sm">
+                                    Accetto i
+                                    <a href="#" class="link text-astami-orange">Termini di Servizio</a>
+                                    e la
+                                    <a href="#" class="link text-astami-orange">Privacy Policy</a>
+                                </span>
+                            </label>
+                        </div>
+
+                        <!-- Newsletter -->
+                        <div class="form-control mb-6">
+                            <label class="label cursor-pointer justify-start gap-3">
+                                <input type="checkbox" class="checkbox checkbox-astami-blue" />
+                                <span class="label-text text-sm">
+                                    Voglio ricevere aggiornamenti e offerte speciali via email
+                                </span>
+                            </label>
+                        </div>
+
+                        <!-- Register Button -->
+                        <button id="registerSubmit" type="submit" class="btn btn-astami-orange w-full mb-4">
+                            <i class="fas fa-user-plus mr-2"></i>
+                            Crea Account
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Agency Registration CTA -->
+            <div class="card gradient-bg text-white">
+                <div class="card-body text-center py-8">
+                    <div class="flex flex-col items-center justify-between gap-6">
+                        <div>
+                            <h3 class="text-2xl font-bold mb-3 flex justify-center items-center">
+                                <i class="fas fa-building mr-3 text-astami-orange"></i>
+                                Sei un'agenzia immobiliare?
+                            </h3>
+                            <p class="text-base opacity-90 mb-4 leading-relaxed">
+                                Scopri i nostri piani business per digitalizzare la tua agenzia.<br>
+                                <strong>Dashboard gestionale, aste trasparenti, CRM integrato e molto altro.</strong>
+                            </p>
+                            <div class="flex flex-col justify-center items-center gap-4 text-sm opacity-80">
+                                <div class="flex items-center">
+                                    <i class="fas fa-check mr-2 text-astami-orange"></i>
+                                    <span>Prova gratuita 14 giorni</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fas fa-check mr-2 text-astami-orange"></i>
+                                    <span>Setup guidato</span>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fas fa-check mr-2 text-astami-orange"></i>
+                                    <span>Supporto dedicato</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex flex-col md:flex-row gap-3 min-w-[200px]">
+                            <a asp-controller="Pricing" asp-action="Index"
+                               class="btn btn-astami-orange btn-lg shadow-astami-dark-orange hover:scale-105 transition-transform">
+                                <i class="fas fa-crown mr-2"></i>
+                                Vedi i Piani
+                            </a>
+                            <a asp-controller="Agency" asp-action="RegisterAgency"
+                               class="btn btn-outline btn-lg text-white border-white hover:bg-white hover:text-astami-blue">
+                                <i class="fas fa-rocket mr-2"></i>
+                                Registra Agenzia
+                            </a>
+                        </div>
                     </div>
 
-                    <!-- Terms and Conditions -->
-                    <div class="form-control mb-6">
-                        <label class="label cursor-pointer justify-start gap-3">
-                            <input type="checkbox" class="checkbox checkbox-astami-orange" required />
-                            <span class="label-text text-sm">
-                                Accetto i
-                                <a href="#" class="link text-astami-orange">Termini di Servizio</a>
-                                e la
-                                <a href="#" class="link text-astami-orange">Privacy Policy</a>
-                            </span>
-                        </label>
+                    <!-- Trust indicators -->
+                    <div class="mt-6 pt-6 border-t border-white/20">
+                        <div class="flex flex-wrap justify-center items-center gap-6 text-sm opacity-80">
+                            <div class="flex items-center">
+                                <i class="fas fa-users mr-2"></i>
+                                <span>250+ agenzie attive</span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-star mr-2"></i>
+                                <span>4.8/5 soddisfazione</span>
+                            </div>
+                            <div class="flex items-center">
+                                <i class="fas fa-shield-alt mr-2"></i>
+                                <span>Dati sicuri e protetti</span>
+                            </div>
+                        </div>
                     </div>
-
-                    <!-- Newsletter -->
-                    <div class="form-control mb-6">
-                        <label class="label cursor-pointer justify-start gap-3">
-                            <input type="checkbox" class="checkbox checkbox-astami-blue" />
-                            <span class="label-text text-sm">
-                                Voglio ricevere aggiornamenti e offerte speciali via email
-                            </span>
-                        </label>
-                    </div>
-
-                    <!-- Register Button -->
-                    <button id="registerSubmit" type="submit" class="btn btn-astami-orange w-full mb-4">
-                        <i class="fas fa-user-plus mr-2"></i>
-                        Crea Account
-                    </button>
-                </form>
+                </div>
             </div>
         </div>
 
@@ -134,18 +198,6 @@
                 </div>
             }
         }
-
-        <!-- Agency Registration CTA -->
-        <div class="card gradient-bg text-white">
-            <div class="card-body text-center py-6">
-                <h3 class="text-lg font-bold mb-2">Sei un'agenzia immobiliare?</h3>
-                <p class="text-sm opacity-90 mb-4">Scopri i nostri piani business per digitalizzare la tua agenzia</p>
-                <button class="btn btn-outline btn-sm text-white border-white hover:bg-white hover:text-astami-orange">
-                    <i class="fas fa-building mr-2"></i>
-                    Registrazione Agenzia
-                </button>
-            </div>
-        </div>
 
         <!-- Help Text -->
         <div class="text-center text-sm text-base-content/70">

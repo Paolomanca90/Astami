@@ -6,5 +6,6 @@
 		public string ApplicationUserId { get; set; }
 		public Guid AbbonamentoId { get; set; }
 		public bool Confermato { get; set; }
+		public Abbonamento Abbonamento { get; set; } = new Abbonamento();
 	}
 }
