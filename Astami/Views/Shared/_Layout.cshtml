@@ -12,25 +12,45 @@
 
     <!-- Font Awesome per le icone -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <!-- SweetAlert2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet" />
 </head>
 <body>
-    <header>
-        <nav class="navbar gradient-bg shadow-lg sticky top-0 z-50 text-white">
+    <header class="sticky top-0 z-50">
+        <nav class="navbar navbar-glassmorphism shadow-lg px-1 lg:px-4">
             <div class="navbar-start">
-                <div class="dropdown">
-                    <div tabindex="0" role="button" class="btn btn-ghost lg:hidden">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16"></path>
-                        </svg>
-                    </div>
-                    <ul tabindex="0" class="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow-lg">
-                        <li><a asp-area="" asp-controller="Home" asp-action="Privacy" class="font-medium">Chi Siamo</a></li>
-                        <li><a href="#" class="font-medium">Pricing</a></li>
-                    </ul>
-                </div>
                 <a asp-area="" asp-controller="Home" asp-action="Index" class="brand-astami text-2xl">
-                    <img src="/img/logo_astami.png" class="w-[8em]" alt="logo" />
+                    <img id="logo-img" class="w-[8em] md:w-[8em]" alt="logo" />
                 </a>
+
+                <style>
+                    /* Desktop - tema chiaro */
+                    #logo-img {
+                        content: url('/img/esteso_blu.svg');
+                    }
+
+                    /* Desktop - tema scuro */
+                    [data-theme="dark"] #logo-img {
+                        content: url('/img/esteso_bianco.svg');
+                    }
+
+                    /* Mobile - tema chiaro */
+                    @@media (max-width: 768px) {
+                        #logo-img
+
+                    {
+                        content: url('/img/icona_blu.svg');
+                        width: 1.5em;
+                    }
+
+                    /* Mobile - tema scuro */
+                    [data-theme="dark"] #logo-img {
+                        content: url('/img/icona_bianca.svg');
+                    }
+
+                    }
+                </style>
             </div>
 
             <div class="navbar-center hidden lg:flex">
@@ -57,7 +77,7 @@
                 }
 
                 <!-- Theme Toggle -->
-                <label class="btn btn-ghost btn-circle swap swap-rotate mr-2 hover:bg-astami-dark-orange hover:text-white hover:border-astami-dark-orange">
+                <label class="btn btn-ghost btn-circle swap swap-rotate hover:bg-astami-dark-orange hover:text-white hover:border-astami-dark-orange">
                     <input type="checkbox" class="theme-controller" value="dark" />
                     <i class="fas fa-sun swap-off text-lg"></i>
                     <i class="fas fa-moon swap-on text-lg"></i>
@@ -65,6 +85,19 @@
 
                 <!-- Auth Section -->
                 <partial name="_LoginPartial" />
+
+                <!-- sostituire con menù a pagina intera -->
+                @* <div class="dropdown">
+                    <div tabindex="0" role="button" class="btn btn-ghost lg:hidden">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16"></path>
+                        </svg>
+                    </div>
+                    <ul tabindex="0" class="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow-lg">
+                        <li><a asp-area="" asp-controller="Home" asp-action="Privacy" class="font-medium">Chi Siamo</a></li>
+                        <li><a href="#" class="font-medium">Pricing</a></li>
+                    </ul>
+                </div> *@
             </div>
         </nav>
     </header>
@@ -88,8 +121,8 @@
                 <!-- Logo e Descrizione -->
                 <div class="lg:col-span-2">
                     <div class="mb-6">
-                        <img src="/img/logo_astami.png" width="250" alt="ASTAMI Logo"
-                             class="mb-4 transition-transform duration-300 hover:scale-105 brightness-110 hover:brightness-125" />
+                        <img src="/img/esteso_bianco.svg" width="250" alt="ASTAMI Logo"
+                             class="mb-4" />
                     </div>
                     <p class="text-lg text-white/90 mb-6 leading-relaxed max-w-md">
                         Il nuovo modo di proporre e scegliere immobili in totale trasparenza attraverso aste digitali innovative.
@@ -258,6 +291,8 @@
             }
         });
     </script>
+    <!-- SweetAlert2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)

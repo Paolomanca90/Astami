@@ -6,6 +6,13 @@ using Astami.Data;
 using Astami.Models;
 using Astami.Utilities.Constants;
 using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
+using Stripe.BillingPortal;
+using Stripe.Checkout;
+using SessionCreateOptions = Stripe.Checkout.SessionCreateOptions;
+using SessionService = Stripe.Checkout.SessionService;
+using Stripe;
+using Session = Stripe.Checkout.Session;
 
 namespace Astami.Controllers
 {
@@ -195,7 +202,7 @@ namespace Astami.Controllers
 					AbbonamentoId = model.AbbonamentoId,
 					Abbonamento = await _context.Abbonamento.FindAsync(model.AbbonamentoId),
 					DataRegistrazione = DateTime.UtcNow,
-					IsActive = true
+					IsActive = false
 				};
 
 				_context.Agenzia.Add(agenzia);
@@ -230,8 +237,7 @@ namespace Astami.Controllers
 					await _signInManager.SignInAsync(user, isPersistent: false);
 				}
 
-				TempData["SuccessMessage"] = "Agenzia registrata con successo! Benvenuto in ASTAMI.";
-				return RedirectToAction("Dashboard", "Agency");
+				return RedirectToAction("CreatCheckoutSession", new {id = user.Id, abbonamentoId = model.AbbonamentoId});
 			}
 			catch (Exception)
 			{
@@ -241,6 +247,179 @@ namespace Astami.Controllers
 				model.IsUserAuthenticated = User.Identity.IsAuthenticated;
 				return View(model);
 			}
+		}
+
+		public IActionResult CreateCheckoutSession(string id, Guid abbonamentoId)
+		{
+			if (id == null)
+				return BadRequest("Utente non loggato");
+			ViewBag.AbbonamentoId = abbonamentoId;
+			return View();
+		}
+
+		[HttpPost]
+		public IActionResult CreateCheckoutSession(Guid abbonamentoId)
+		{
+			var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+			if (string.IsNullOrEmpty(userId))
+			{
+				return BadRequest("L'utente non esiste.");
+			}
+
+			var piano = _context.Abbonamento.FirstOrDefault(x => x.AbbonamentoId == abbonamentoId);
+			if (piano == null)
+			{
+				return BadRequest("Piano non trovato.");
+			}
+
+			var total = piano.Prezzo;
+			var agenziaId = _context.Agenzia.OrderByDescending(x => x.DataRegistrazione).FirstOrDefault(x => x.ApplicationUserId == userId && x.IsActive == false)?.AgenziaId;
+			if (agenziaId == null)
+			{
+				return BadRequest("Agenzia non trovata.");
+			}
+
+			var customerId = CreateOrGetStripeCustomer();
+
+			var options = new SessionCreateOptions
+			{
+				Customer = customerId,
+				PaymentMethodTypes = new List<string> { "card", "klarna", "paypal", "samsung_pay", "sepa_debit" },
+				LineItems = new List<SessionLineItemOptions>
+				{
+					new SessionLineItemOptions
+					{
+						PriceData = new SessionLineItemPriceDataOptions
+						{
+							UnitAmount = Convert.ToInt64(total * 100),
+							Currency = "eur",
+							ProductData = new SessionLineItemPriceDataProductDataOptions
+							{
+								Name = "Registrazione Astami",
+								Metadata = new Dictionary<string, string>
+								{
+									{"P_IVA", GetCustomerMetadata("P_IVA")},
+									{"AgenziaId", agenziaId.ToString()}
+								}
+							},
+						},
+						Quantity = 1,
+					},
+				},
+				Mode = "payment",
+				SuccessUrl = $"{Request.Scheme}://{Request.Host}/Partner/PaymentSuccess?sessionId={{CHECKOUT_SESSION_ID}}",
+				CancelUrl = Url.Action("PaymentCancel", "Partner", null, Request.Scheme),
+				PaymentIntentData = new SessionPaymentIntentDataOptions
+				{
+					Metadata = new Dictionary<string, string>
+					{
+						{"P_IVA", GetCustomerMetadata("P_IVA")},
+						{"AgenziaId", agenziaId.ToString()}
+					}
+				}
+			};
+
+			var service = new SessionService();
+			var session = service.Create(options);
+
+			return Json(new { url = session.Url });
+		}
+
+		private string CreateOrGetStripeCustomer()
+		{
+			var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+			var agenzia = _context.Agenzia.OrderByDescending(x => x.DataRegistrazione).FirstOrDefault(x => x.ApplicationUserId == userId && x.IsActive == false);
+
+			var customerService = new CustomerService();
+
+			var searchOptions = new CustomerSearchOptions
+			{
+				Query = $"email:'{agenzia?.Email}' AND metadata['P_IVA']:'{agenzia?.PartitaIVA}'"
+			};
+
+			var existingCustomers = customerService.Search(searchOptions);
+			if (existingCustomers.Any())
+				return existingCustomers.First().Id;
+
+			var customerOptions = new CustomerCreateOptions
+			{
+				Email = agenzia?.Email,
+				Name = agenzia?.RagioneSociale,
+				Address = new AddressOptions
+				{
+					City = agenzia?.Città,
+					Country = "IT",
+					Line1 = agenzia?.Indirizzo,
+					PostalCode = agenzia?.CAP,
+					State = agenzia?.Provincia
+				},
+				Phone = agenzia?.Telefono,
+				Metadata = new Dictionary<string, string>
+				{
+					{"P_IVA", agenzia?.PartitaIVA}
+				}
+			};
+
+			var newCustomer = customerService.Create(customerOptions);
+			return newCustomer.Id;
+		}
+
+		private string GetCustomerMetadata(string key)
+		{
+			var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+			var agenzia = _context.Agenzia.OrderByDescending(x => x.DataRegistrazione).FirstOrDefault(x => x.ApplicationUserId == userId && x.IsActive == false);
+			return key switch
+			{
+				"P_IVA" => agenzia?.PartitaIVA,
+				_ => string.Empty
+			};
+		}
+
+		public IActionResult PaymentSuccess(string sessionId)
+		{
+			var service = new SessionService();
+			Session session = service.Get(sessionId);
+
+			if (session.PaymentStatus == "paid")
+			{
+				var paymentIntentService = new PaymentIntentService();
+				PaymentIntent paymentIntent = paymentIntentService.Get(session.PaymentIntentId);
+				var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+				var agenzia = _context.Agenzia.OrderByDescending(x => x.DataRegistrazione).FirstOrDefault(x => x.ApplicationUserId == userId && x.IsActive == false);
+				if (agenzia != null)
+				{
+					agenzia.IsActive = true;
+					_context.Agenzia.Update(agenzia);
+					var pianoSelezionato = _context.PianoSelezionato.FirstOrDefault(x => x.ApplicationUserId == userId && x.Confermato == false);
+					if (pianoSelezionato == null)
+					{
+						ViewBag.Errore = "Errore: Piano selezionato non trovato.";
+						return RedirectToAction("Index", "Pricing");
+					}
+
+					pianoSelezionato.Confermato = true;
+					_context.PianoSelezionato.Update(pianoSelezionato);
+
+					TempData["SuccessMessage"] = "Agenzia registrata con successo! Benvenuto in ASTAMI.";
+					return RedirectToAction("Dashboard");
+				}
+				else
+				{
+					TempData["Errore"] = "Errore: Agenzia non trovata.";
+				}
+			}
+			else
+			{
+				TempData["Errore"] = "Errore: Il pagamento non è stato completato.";
+			}
+
+			return RedirectToAction("Index", "Pricing");
+		}
+
+		public IActionResult PaymentCancel()
+		{
+			TempData["Errore"] = "Pagamento annullato.";
+			return RedirectToAction("Index", "Pricing");
 		}
 
 		[HttpGet]

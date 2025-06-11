@@ -55,14 +55,23 @@
 else
 {
     <!-- Auth buttons quando non è loggato -->
-    <div class="flex gap-2">
-        <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-ghost font-medium">
-            <i class="fas fa-sign-in-alt mr-2"></i>
+    <div class="dropdown dropdown-end">
+        <div tabindex="0" role="button" class="btn btn-ghost font-medium hover:text-astami-orange h-auto py-1">
             Accedi
-        </a>
-        <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-astami-orange font-medium shadow-astami-dark-orange">
-            <i class="fas fa-user-plus mr-2"></i>
-            Registrati
-        </a>
+        </div>
+        <ul tabindex="0" class="menu dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow-lg">
+            <li>
+                <a asp-area="Identity" asp-page="/Account/Login" class="font-medium">
+                    <i class="fas fa-sign-in-alt mr-2"></i>
+                    Accedi
+                </a>
+            </li>
+            <li>
+                <a asp-area="Identity" asp-page="/Account/Register" class="font-medium">
+                    <i class="fas fa-user-plus mr-2"></i>
+                    Registrati
+                </a>
+            </li>
+        </ul>
     </div>
 }

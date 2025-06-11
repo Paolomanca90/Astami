@@ -46,12 +46,14 @@
 
                         <!-- Prezzo -->
                         <div class="mb-6">
-                            <div class="text-5xl font-bold @(abbonamento.Nome == "Basic" ? "text-astami-blue" : abbonamento.Nome == "PRO" ? "text-astami-orange" : "text-primary")">
-                                €<span class="monthly-price">@abbonamento.Prezzo.ToString("0")</span>
-                                <span class="yearly-price hidden">@((abbonamento.Prezzo * 12 * 0.8m).ToString("0"))</span>
-                            </div>
-                            <div class="text-base-content/70">
-                                /<span class="billing-period">mese</span>
+                            <div class="flex items-baseline justify-center">
+                                <div class="text-5xl font-bold @(abbonamento.Nome == "Basic" ? "text-astami-blue" : abbonamento.Nome == "PRO" ? "text-astami-orange" : "text-primary")">
+                                    €<span class="monthly-price">@abbonamento.Prezzo.ToString("0")</span>
+                                    <span class="yearly-price hidden">@((abbonamento.Prezzo * 12 * 0.8m).ToString("0"))</span>
+                                </div>
+                                <div class="text-base-content/70">
+                                    /<span class="billing-period">mese</span>
+                                </div>
                             </div>
                             <div class="yearly-savings hidden text-success text-sm font-medium mt-1">
                                 Risparmi €@((abbonamento.Prezzo * 12 * 0.2m).ToString("0")) all'anno
