@@ -1,0 +1,391 @@
+﻿@model Astami.Controllers.AggiungiCollaboratoreViewModel
+
+@{
+    ViewData["Title"] = "Aggiungi Collaboratore";
+}
+
+<div class="min-h-screen bg-base-200 pb-7">
+    <!-- Header -->
+    <div class="gradient-bg text-white py-8">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold mb-2">
+                        <i class="fas fa-user-plus mr-3"></i>
+                        Aggiungi Collaboratore
+                    </h1>
+                    <p class="text-white/80">
+                        Inserisci i dati del nuovo collaboratore
+                    </p>
+                </div>
+                <div>
+                    <a asp-action="Index" class="btn btn-outline btn-white">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Torna alla lista
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mx-auto px-4 -mt-4">
+        <div class="max-w-2xl mx-auto">
+            <div class="card bg-base-100 shadow-xl">
+                <div class="card-body p-8">
+                    <h2 class="card-title text-xl mb-6">
+                        <i class="fas fa-user-circle text-astami-blue mr-2"></i>
+                        Dati del Collaboratore
+                    </h2>
+
+                    <form asp-action="Aggiungi" method="post" class="space-y-6">
+                        @Html.AntiForgeryToken()
+                        @Html.HiddenFor(m => m.AgenziaId)
+
+                        <!-- Sezione Dati Personali -->
+                        <div class="border-l-4 border-astami-blue pl-4">
+                            <h3 class="text-lg font-semibold mb-4 text-astami-blue">
+                                <i class="fas fa-id-card mr-2"></i>
+                                Informazioni Personali
+                            </h3>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="form-control">
+                                    <label asp-for="Nome" class="label label-text font-medium">
+                                        <i class="fas fa-user mr-2"></i>
+                                        Nome *
+                                    </label>
+                                    <input asp-for="Nome" class="input input-bordered @(ViewData.ModelState.ContainsKey("Nome") ? "" : "input-error")" 
+                                           placeholder="Inserisci il nome" />
+                                    <span asp-validation-for="Nome" class="text-error text-sm mt-1"></span>
+                                </div>
+
+                                <div class="form-control">
+                                    <label asp-for="Cognome" class="label label-text font-medium">
+                                        <i class="fas fa-user mr-2"></i>
+                                        Cognome *
+                                    </label>
+                                    <input asp-for="Cognome" class="input input-bordered @(ViewData.ModelState.ContainsKey("Cognome") ? "" : "input-error")" 
+                                           placeholder="Inserisci il cognome" />
+                                    <span asp-validation-for="Cognome" class="text-error text-sm mt-1"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sezione Contatti -->
+                        <div class="border-l-4 border-astami-orange pl-4">
+                            <h3 class="text-lg font-semibold mb-4 text-astami-orange">
+                                <i class="fas fa-address-book mr-2"></i>
+                                Informazioni di Contatto
+                            </h3>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="form-control">
+                                    <label asp-for="Email" class="label label-text font-medium">
+                                        <i class="fas fa-envelope mr-2"></i>
+                                        Email *
+                                    </label>
+                                    <input asp-for="Email" type="email" class="input input-bordered @(ViewData.ModelState.ContainsKey("Email") ? "" : "input-error")" 
+                                           placeholder="esempio@email.com" />
+                                    <span asp-validation-for="Email" class="text-error text-sm mt-1"></span>
+                                    <div class="label mt-1">
+                                        <span class="label-text-alt text-base-content/60">
+                                            <i class="fas fa-info-circle mr-1"></i>
+                                            Se l'utente esiste già, verrà aggiunto come collaboratore
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div class="form-control">
+                                    <label asp-for="Telefono" class="label label-text font-medium">
+                                        <i class="fas fa-phone mr-2"></i>
+                                        Telefono
+                                    </label>
+                                    <input asp-for="Telefono" type="tel" class="input input-bordered @(ViewData.ModelState.ContainsKey("Telefono") ? "" : "input-error")" 
+                                           placeholder="+39 123 456 7890" />
+                                    <span asp-validation-for="Telefono" class="text-error text-sm mt-1"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sezione Account -->
+                        <div class="border-l-4 border-success pl-4">
+                            <h3 class="text-lg font-semibold mb-4 text-success">
+                                <i class="fas fa-key mr-2"></i>
+                                Credenziali di Accesso
+                            </h3>
+                            <div class="form-control">
+                                <div>
+                                    <label asp-for="Password" class="label label-text font-medium">
+                                        <i class="fas fa-lock mr-2"></i>
+                                        Password *
+                                    </label>
+                                    <input asp-for="Password" type="password" class="input input-bordered block w-full @(ViewData.ModelState.ContainsKey("Password") ? "" : "input-error")" 
+                                            placeholder="Inserisci una password sicura" />
+                                    <span asp-validation-for="Password" class="text-error text-sm mt-1"></span>
+                                    <div class="label mt-1">
+                                        <span class="label-text-alt text-base-content/60">
+                                            <i class="fas fa-shield-alt mr-1"></i>
+                                            Minimo 6 caratteri - Sarà richiesta solo per nuovi utenti
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sezione Ruolo -->
+                        <div class="border-l-4 border-warning pl-4">
+                            <h3 class="text-lg font-semibold mb-4 text-warning">
+                                <i class="fas fa-user-tag mr-2"></i>
+                                Ruolo nell'Agenzia
+                            </h3>
+                            
+                            <div class="form-control">
+                                <label asp-for="Ruolo" class="label label-text font-medium">
+                                    <i class="fas fa-id-badge mr-2"></i>
+                                    Seleziona Ruolo *
+                                </label>
+                                <select asp-for="Ruolo" class="select select-bordered @(ViewData.ModelState.ContainsKey("Ruolo") ? "" : "select-error")">
+                                    <option value="">Seleziona un ruolo...</option>
+                                    @foreach (var ruolo in Model.RuoliDisponibili)
+                                    {
+                                        <option value="@ruolo" selected="@(Model.Ruolo == ruolo)">
+                                            @ruolo
+                                        </option>
+                                    }
+                                </select>
+                                <span asp-validation-for="Ruolo" class="text-error text-sm mt-1"></span>
+                            </div>
+
+                            <!-- Descrizione Ruoli -->
+                            <div class="mt-4 p-4 bg-base-200 rounded-lg">
+                                <h4 class="font-semibold mb-2">
+                                    <i class="fas fa-question-circle mr-2"></i>
+                                    Descrizione Ruoli:
+                                </h4>
+                                <div class="space-y-2 text-sm">
+                                    <div class="flex items-start">
+                                        <span class="badge badge-warning badge-sm mr-2 mt-0.5">Manager</span>
+                                        <span>Gestione completa dell'agenzia e supervisione dei collaboratori</span>
+                                    </div>
+                                    <div class="flex items-start">
+                                        <span class="badge badge-success badge-sm mr-2 mt-0.5">Agente</span>
+                                        <span>Gestione clienti e contratti, accesso alle pratiche</span>
+                                    </div>
+                                    <div class="flex items-start">
+                                        <span class="badge badge-info badge-sm mr-2 mt-0.5">Collaboratore</span>
+                                        <span>Supporto operativo e assistenza nelle attività quotidiane</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Validation Summary -->
+                        @if (!ViewData.ModelState.IsValid)
+                        {
+                            <div class="alert alert-error">
+                                <div>
+                                    <i class="fas fa-exclamation-triangle mr-2"></i>
+                                    <strong>Attenzione!</strong> Correggi i seguenti errori:
+                                    <div asp-validation-summary="ModelOnly" class="mt-2"></div>
+                                </div>
+                            </div>
+                        }
+
+                        <!-- Azioni -->
+                        <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t">
+                            <button type="submit" class="btn btn-astami-blue flex-1">
+                                <i class="fas fa-user-plus mr-2"></i>
+                                Aggiungi Collaboratore
+                            </button>
+                            <a asp-action="Index" class="btn btn-outline flex-1">
+                                <i class="fas fa-times mr-2"></i>
+                                Annulla
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Info Card -->
+            <div class="card bg-info text-info-content mt-6">
+                <div class="card-body">
+                    <h3 class="card-title">
+                        <i class="fas fa-lightbulb mr-2"></i>
+                        Suggerimenti
+                    </h3>
+                    <ul class="list-disc list-inside space-y-1 text-sm">
+                        <li>Se l'email inserita corrisponde a un utente esistente, verrà aggiunto come collaboratore senza creare un nuovo account</li>
+                        <li>La password è richiesta solo per la creazione di nuovi utenti</li>
+                        <li>Tutti i collaboratori riceveranno automaticamente l'accesso al sistema</li>
+                        <li>I ruoli possono essere modificati successivamente dalla lista collaboratori</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Validazione client-side migliorata
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.querySelector('form');
+        const emailInput = document.querySelector('input[name="Email"]');
+        const passwordInput = document.querySelector('input[name="Password"]');
+        
+        // Validazione email in tempo reale
+        emailInput.addEventListener('blur', function() {
+            const email = this.value;
+            if (email) {
+                // Qui potresti aggiungere una chiamata AJAX per verificare se l'utente esiste
+                console.log('Verifica esistenza utente:', email);
+            }
+        });
+
+        // Generatore password suggerita
+        const generatePasswordBtn = document.createElement('button');
+        generatePasswordBtn.type = 'button';
+        generatePasswordBtn.className = 'btn btn-sm btn-outline btn-secondary mt-2 block w-full';
+        generatePasswordBtn.innerHTML = '<i class="fas fa-random mr-1"></i> Genera Password';
+        generatePasswordBtn.onclick = function() {
+            const password = generateSecurePassword();
+            passwordInput.value = password;
+            showPasswordStrength(password);
+        };
+        
+        passwordInput.parentNode.appendChild(generatePasswordBtn);
+
+        // Mostra forza password
+        passwordInput.addEventListener('input', function() {
+            showPasswordStrength(this.value);
+        });
+    });
+
+    // Genera password sicura
+    function generateSecurePassword() {
+        const length = 12;
+        const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@@#$%^&*";
+        let password = "";
+        for (let i = 0; i < length; i++) {
+            password += charset.charAt(Math.floor(Math.random() * charset.length));
+        }
+        return password;
+    }
+
+    // Mostra indicatore forza password
+    function showPasswordStrength(password) {
+        let strength = 0;
+        const indicators = {
+            length: password.length >= 8,
+            lowercase: /[a-z]/.test(password),
+            uppercase: /[A-Z]/.test(password),
+            numbers: /\d/.test(password),
+            special: /[!@@#$%^&*(),.?":{}|<>]/.test(password)
+        };
+
+        strength = Object.values(indicators).filter(Boolean).length;
+        
+        const strengthIndicator = document.getElementById('password-strength') || createStrengthIndicator();
+        const strengthText = ['Molto Debole', 'Debole', 'Sufficiente', 'Buona', 'Eccellente'][strength - 1] || 'Molto Debole';
+        const strengthColor = ['text-error', 'text-warning', 'text-info', 'text-success', 'text-success'][strength - 1] || 'text-error';
+        
+        strengthIndicator.innerHTML = `
+            <div class="flex items-center justify-between mt-2">
+                <span class="text-sm ${strengthColor}">Forza: ${strengthText}</span>
+                <div class="flex space-x-1">
+                    ${Array.from({length: 5}, (_, i) => 
+                        `<div class="w-2 h-2 rounded-full ${i < strength ? strengthColor.replace('text-', 'bg-') : 'bg-base-300'}"></div>`
+                    ).join('')}
+                </div>
+            </div>
+        `;
+    }
+
+    function createStrengthIndicator() {
+        const indicator = document.createElement('div');
+        indicator.id = 'password-strength';
+        document.querySelector('input[name="Password"]').parentNode.appendChild(indicator);
+        return indicator;
+    }
+
+    // Gestisci messaggi TempData
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <text>
+        Swal.fire({
+            title: 'Successo!',
+            text: '@TempData["SuccessMessage"]',
+            icon: 'success',
+            timer: 3000,
+            showConfirmButton: false,
+            toast: true,
+            position: 'top-end'
+        });
+        </text>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <text>
+        Swal.fire({
+            title: 'Errore!',
+            text: '@TempData["ErrorMessage"]',
+            icon: 'error',
+            confirmButtonText: 'OK'
+        });
+        </text>
+    }
+
+    // Validazione avanzata del form con SweetAlert
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const requiredFields = ['Nome', 'Cognome', 'Email', 'Password', 'Ruolo'];
+        const emptyFields = [];
+        
+        requiredFields.forEach(field => {
+            const input = document.querySelector(`input[name="${field}"], select[name="${field}"]`);
+            if (input && !input.value.trim()) {
+                emptyFields.push(field);
+            }
+        });
+        
+        if (emptyFields.length > 0) {
+            e.preventDefault();
+            Swal.fire({
+                title: 'Campi obbligatori mancanti!',
+                html: `I seguenti campi sono obbligatori:<br><strong>${emptyFields.join(', ')}</strong>`,
+                icon: 'warning',
+                confirmButtonText: 'OK'
+            });
+            return;
+        }
+        
+        // Mostra loading durante l'invio
+        Swal.fire({
+            title: 'Aggiunta collaboratore...',
+            text: 'Attendere prego',
+            icon: 'info',
+            allowOutsideClick: false,
+            showConfirmButton: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+    });
+
+    function showAlert(type, message) {
+        const config = {
+            title: type === 'success' ? 'Successo!' : 'Errore!',
+            text: message,
+            icon: type,
+            confirmButtonText: 'OK'
+        };
+        
+        if (type === 'success') {
+            config.timer = 3000;
+            config.showConfirmButton = false;
+            config.toast = true;
+            config.position = 'top-end';
+        }
+        
+        Swal.fire(config);
+    }
+</script>

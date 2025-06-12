@@ -1,0 +1,450 @@
+﻿@model Astami.Controllers.CollaboratoriIndexViewModel
+
+@{
+    ViewData["Title"] = "Gestione Collaboratori";
+}
+
+<div class="min-h-screen bg-base-200 pb-7">
+    <!-- Header -->
+    <div class="gradient-bg text-white py-8">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold mb-2">
+                        <i class="fas fa-users mr-3"></i>
+                        Gestione Collaboratori
+                    </h1>
+                    <p class="text-white/80">
+                        <i class="fas fa-building mr-2"></i>
+                        @Model.Agenzia.RagioneSociale
+                    </p>
+                </div>
+                <div class="mt-4 lg:mt-0">
+                    <a asp-action="Aggiungi" class="btn btn-astami-orange btn-lg shadow-astami-orange">
+                        <i class="fas fa-user-plus mr-2"></i>
+                        Aggiungi Collaboratore
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mx-auto px-4 -mt-4">
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="card bg-base-100 shadow-xl">
+                <div class="card-body p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-sm font-medium text-base-content/70">Totale Collaboratori</h3>
+                            <p class="text-3xl font-bold text-astami-blue">@Model.Collaboratori.Count</p>
+                        </div>
+                        <div class="w-12 h-12 bg-astami-blue/10 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-users text-astami-blue text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card bg-base-100 shadow-xl">
+                <div class="card-body p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-sm font-medium text-base-content/70">Manager</h3>
+                            <p class="text-3xl font-bold text-astami-orange">@Model.Collaboratori.Count(c => c.Ruolo == "Manager")</p>
+                        </div>
+                        <div class="w-12 h-12 bg-astami-orange/10 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-user-tie text-astami-orange text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card bg-base-100 shadow-xl">
+                <div class="card-body p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-sm font-medium text-base-content/70">Agenti</h3>
+                            <p class="text-3xl font-bold text-success">@Model.Collaboratori.Count(c => c.Ruolo == "Agente")</p>
+                        </div>
+                        <div class="w-12 h-12 bg-success/10 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-handshake text-success text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista Collaboratori -->
+        <div class="card bg-base-100 shadow-xl">
+            <div class="card-body p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="card-title text-xl">
+                        <i class="fas fa-list text-astami-blue mr-2"></i>
+                        Lista Collaboratori
+                    </h2>
+                    <div class="flex items-center gap-2">
+                        <div class="form-control">
+                            <input type="text" placeholder="Cerca collaboratori..." class="input input-bordered w-64" id="searchInput" />
+                        </div>
+                        <div class="dropdown dropdown-end">
+                            <div tabindex="0" role="button" class="btn btn-outline">
+                                <i class="fas fa-filter mr-2"></i>
+                                Filtra per ruolo
+                            </div>
+                            <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
+                                <li><a onclick="filterByRole('all')">Tutti</a></li>
+                                <li><a onclick="filterByRole('Manager')">Manager</a></li>
+                                <li><a onclick="filterByRole('Agente')">Agenti</a></li>
+                                <li><a onclick="filterByRole('Collaboratore')">Collaboratori</a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                @if (Model.Collaboratori.Any())
+                {
+                    <div class="overflow-x-auto">
+                        <table class="table table-zebra w-full">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <i class="fas fa-user mr-2"></i>
+                                        Collaboratore
+                                    </th>
+                                    <th>
+                                        <i class="fas fa-envelope mr-2"></i>
+                                        Contatti
+                                    </th>
+                                    <th>
+                                        <i class="fas fa-id-badge mr-2"></i>
+                                        Ruolo
+                                    </th>
+                                    <th>
+                                        <i class="fas fa-calendar mr-2"></i>
+                                        Data Assegnazione
+                                    </th>
+                                    <th>
+                                        <i class="fas fa-cogs mr-2"></i>
+                                        Azioni
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody id="collaboratoriTable">
+                                @foreach (var collaboratore in Model.Collaboratori.OrderBy(c => c.DataAssegnazione))
+                                {
+                                    <tr data-role="@collaboratore.Ruolo" class="collaboratore-row">
+                                        <td>
+                                            <div class="flex items-center space-x-3">
+                                                <div class="avatar">
+                                                    <div class="w-12 h-12 rounded-full bg-primary text-primary-content flex items-center justify-center">
+                                                        @(collaboratore.ApplicationUser.Nome?.FirstOrDefault())@(collaboratore.ApplicationUser.Cognome?.FirstOrDefault())
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <div class="font-bold">@collaboratore.ApplicationUser.Nome @collaboratore.ApplicationUser.Cognome</div>
+                                                    <div class="text-sm opacity-80">
+                                                        @if (collaboratore.ApplicationUserId == Model.Agenzia.ApplicationUserId)
+                                                        {
+                                                            <span class="badge bg-astami-blue badge-sm text-white">Proprietario</span>
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="space-y-1">
+                                                <div class="flex items-center">
+                                                    <i class="fas fa-envelope text-base-content/50 mr-2"></i>
+                                                    <span class="text-sm">@collaboratore.ApplicationUser.Email</span>
+                                                </div>
+                                                @if (!string.IsNullOrEmpty(collaboratore.ApplicationUser.PhoneNumber))
+                                                {
+                                                    <div class="flex items-center">
+                                                        <i class="fas fa-phone text-base-content/50 mr-2"></i>
+                                                        <span class="text-sm">@collaboratore.ApplicationUser.PhoneNumber</span>
+                                                    </div>
+                                                }
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="dropdown dropdown-hover">
+                                                <div tabindex="0" role="button" class="badge @GetRoleBadgeClass(collaboratore.Ruolo) @(collaboratore.ApplicationUserId != Model.Agenzia.ApplicationUserId ? "cursor-pointer" : "")">
+                                                    @GetRoleDisplayName(collaboratore.Ruolo)
+                                                    @if (collaboratore.ApplicationUserId != Model.Agenzia.ApplicationUserId)
+                                                    {
+                                                        <i class="fas fa-chevron-down ml-1"></i>
+                                                    }
+                                                </div>
+                                                @if (collaboratore.ApplicationUserId != Model.Agenzia.ApplicationUserId)
+                                                {
+                                                    <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
+                                                        <li><a onclick="cambiaRuolo('@collaboratore.AgenziaUtenteId', 'Manager')">Manager</a></li>
+                                                        <li><a onclick="cambiaRuolo('@collaboratore.AgenziaUtenteId', 'Agente')">Agente</a></li>
+                                                        <li><a onclick="cambiaRuolo('@collaboratore.AgenziaUtenteId', 'Collaboratore')">Collaboratore</a></li>
+                                                    </ul>
+                                                }
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="flex items-center">
+                                                <i class="fas fa-calendar-alt text-base-content/50 mr-2"></i>
+                                                <span class="text-sm">@collaboratore.DataAssegnazione.ToString("dd/MM/yyyy")</span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="flex items-center space-x-2">
+                                                <a asp-action="Dettagli" asp-route-agenziaUtenteId="@collaboratore.AgenziaUtenteId"
+                                                   class="btn btn-sm btn-outline btn-info" title="Visualizza dettagli">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                @if (collaboratore.ApplicationUserId != Model.Agenzia.ApplicationUserId)
+                                                {
+                                                    <button class="btn btn-sm btn-outline btn-error"
+                                                            onclick="rimuoviCollaboratore('@collaboratore.AgenziaUtenteId', '@collaboratore.ApplicationUser.Nome @collaboratore.ApplicationUser.Cognome')"
+                                                            title="Rimuovi collaboratore">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                }
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center py-12">
+                        <i class="fas fa-users text-4xl text-base-content/30 mb-4"></i>
+                        <h3 class="text-lg font-bold mb-2">Nessun collaboratore ancora</h3>
+                        <p class="text-base-content/70 mb-6">Inizia aggiungendo il tuo primo collaboratore all'agenzia</p>
+                        <a asp-action="Aggiungi" class="btn btn-astami-orange">
+                            <i class="fas fa-user-plus mr-2"></i>
+                            Aggiungi Collaboratore
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@functions {
+    string GetRoleBadgeClass(string ruolo)
+    {
+        return ruolo switch
+        {
+            "Manager" => "badge-warning",
+            "Agente" => "badge-success",
+            "Collaboratore" => "badge-info",
+            _ => "badge-outline"
+        };
+    }
+
+    string GetRoleDisplayName(string ruolo)
+    {
+        return ruolo switch
+        {
+            "Manager" => "Manager",
+            "Agente" => "Agente",
+            "Collaboratore" => "Collaboratore",
+            _ => ruolo
+        };
+    }
+}
+
+<script>
+    // Filtra collaboratori per ruolo
+    function filterByRole(role) {
+        const rows = document.querySelectorAll('.collaboratore-row');
+        rows.forEach(row => {
+            if (role === 'all' || row.dataset.role === role) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+
+    // Ricerca collaboratori
+    document.getElementById('searchInput').addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase();
+        const rows = document.querySelectorAll('.collaboratore-row');
+
+        rows.forEach(row => {
+            const nome = row.querySelector('.font-bold').textContent.toLowerCase();
+            const email = row.querySelector('.fa-envelope').nextElementSibling.textContent.toLowerCase();
+
+            if (nome.includes(searchTerm) || email.includes(searchTerm)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+
+    // Rimuovi collaboratore
+    function rimuoviCollaboratore(agenziaUtenteId, nomeCompleto) {
+        Swal.fire({
+            title: 'Rimuovere collaboratore?',
+            text: `Sei sicuro di voler rimuovere ${nomeCompleto} dai collaboratori? Questa azione può essere annullata.`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Sì, rimuovi',
+            cancelButtonText: 'Annulla',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: 'Rimozione in corso...',
+                    text: 'Attendere prego',
+                    icon: 'info',
+                    allowOutsideClick: false,
+                    showConfirmButton: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                fetch('@Url.Action("Rimuovi")', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                    },
+                    body: `agenziaUtenteId=${agenziaUtenteId}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            title: 'Rimosso!',
+                            text: data.message,
+                            icon: 'success',
+                            timer: 2000,
+                            showConfirmButton: false
+                        }).then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Errore!',
+                            text: data.message,
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                })
+                .catch(error => {
+                    Swal.fire({
+                        title: 'Errore di connessione!',
+                        text: 'Si è verificato un errore durante la rimozione',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                });
+            }
+        });
+    }
+
+    // Cambia ruolo collaboratore
+    function cambiaRuolo(agenziaUtenteId, nuovoRuolo) {
+        Swal.fire({
+            title: 'Cambiare ruolo?',
+            text: `Sei sicuro di voler cambiare il ruolo a ${nuovoRuolo}?`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Sì, cambia ruolo',
+            cancelButtonText: 'Annulla',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: 'Cambio ruolo in corso...',
+                    text: 'Attendere prego',
+                    icon: 'info',
+                    allowOutsideClick: false,
+                    showConfirmButton: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                fetch('@Url.Action("CambiaRuolo")', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                    },
+                    body: `agenziaUtenteId=${agenziaUtenteId}&nuovoRuolo=${nuovoRuolo}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            title: 'Ruolo modificato!',
+                            text: data.message,
+                            icon: 'success',
+                            timer: 2000,
+                            showConfirmButton: false
+                        }).then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Errore!',
+                            text: data.message,
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                })
+                .catch(error => {
+                    Swal.fire({
+                        title: 'Errore di connessione!',
+                        text: 'Si è verificato un errore durante il cambio ruolo',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                });
+            }
+        });
+    }
+
+    // Gestisci messaggi TempData
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <text>
+            Swal.fire({
+                title: 'Successo!',
+                text: '@TempData["SuccessMessage"]',
+                icon: 'success',
+                timer: 3000,
+                showConfirmButton: false,
+                toast: true,
+                position: 'top-end'
+            });
+        </text>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <text>
+            Swal.fire({
+                title: 'Errore!',
+                text: '@TempData["ErrorMessage"]',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        </text>
+    }
+</script>
+
+@* Token per CSRF *@
+@Html.AntiForgeryToken()

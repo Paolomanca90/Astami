@@ -1,0 +1,514 @@
+﻿@model Astami.Models.AgenziaUtente
+
+@{
+    ViewData["Title"] = "Dettagli Collaboratore - " + Model.ApplicationUser.Nome + " " + Model.ApplicationUser.Cognome;
+}
+
+<div class="min-h-screen bg-base-200 pb-7">
+    <!-- Header -->
+    <div class="gradient-bg text-white py-8">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+                <div class="flex items-center">
+                    <div class="avatar mr-4">
+                        <div class="w-16 h-16 rounded-full bg-white/20 text-white flex items-center justify-center text-xl font-bold">
+                            @(Model.ApplicationUser.Nome?.FirstOrDefault())@(Model.ApplicationUser.Cognome?.FirstOrDefault())
+                        </div>
+                    </div>
+                    <div>
+                        <h1 class="text-3xl font-bold mb-2">
+                            @Model.ApplicationUser.Nome @Model.ApplicationUser.Cognome
+                        </h1>
+                        <div class="flex items-center space-x-4 text-white/80">
+                            <span class="badge @GetRoleBadgeClass(Model.Ruolo) badge-lg">
+                                @GetRoleDisplayName(Model.Ruolo)
+                            </span>
+                            @if (Model.ApplicationUserId == Model.Agenzia.ApplicationUserId)
+                            {
+                                <span class="badge badge-info badge-lg">Proprietario</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-4 lg:mt-0 flex space-x-2">
+                    <a asp-action="Index" class="btn btn-outline btn-white">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Torna alla lista
+                    </a>
+                    @if (Model.ApplicationUserId != Model.Agenzia.ApplicationUserId)
+                    {
+                        <div class="dropdown dropdown-end">
+                            <div tabindex="0" role="button" class="btn btn-astami-orange">
+                                <i class="fas fa-cog mr-2"></i>
+                                Azioni
+                                <i class="fas fa-chevron-down ml-2"></i>
+                            </div>
+                            <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow-lg">
+                                <li class="menu-title">
+                                    <span>Gestione Ruolo</span>
+                                </li>
+                                <li>
+                                    <a onclick="cambiaRuolo('@Model.AgenziaUtenteId', 'Manager')">
+                                        <i class="fas fa-user-tie mr-2"></i>Cambia a Manager
+                                    </a>
+                                </li>
+                                <li>
+                                    <a onclick="cambiaRuolo('@Model.AgenziaUtenteId', 'Agente')">
+                                        <i class="fas fa-handshake mr-2"></i>Cambia ad Agente
+                                    </a>
+                                </li>
+                                <li>
+                                    <a onclick="cambiaRuolo('@Model.AgenziaUtenteId', 'Collaboratore')">
+                                        <i class="fas fa-user mr-2"></i>Cambia a Collaboratore
+                                    </a>
+                                </li>
+                                <li class="menu-title">
+                                    <span>Azioni Pericolose</span>
+                                </li>
+                                <li>
+                                    <a onclick="rimuoviCollaboratore('@Model.AgenziaUtenteId', '@Model.ApplicationUser.Nome @Model.ApplicationUser.Cognome')" class="text-error">
+                                        <i class="fas fa-trash mr-2"></i>Rimuovi Collaboratore
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mx-auto px-4 -mt-4">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Informazioni Principali -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- Dati Personali -->
+                <div class="card bg-base-100 shadow-xl">
+                    <div class="card-body">
+                        <h2 class="card-title text-xl mb-4">
+                            <i class="fas fa-user text-astami-blue mr-2"></i>
+                            Informazioni Personali
+                        </h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="space-y-3">
+                                <div class="flex items-center p-3 bg-base-200 rounded-lg">
+                                    <i class="fas fa-user text-astami-blue mr-3"></i>
+                                    <div>
+                                        <div class="text-sm text-base-content/70">Nome Completo</div>
+                                        <div class="font-semibold">@Model.ApplicationUser.Nome @Model.ApplicationUser.Cognome</div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center p-3 bg-base-200 rounded-lg">
+                                    <i class="fas fa-envelope text-astami-blue mr-3"></i>
+                                    <div>
+                                        <div class="text-sm text-base-content/70">Email</div>
+                                        <div class="font-semibold">
+                                            <a href="mailto:@Model.ApplicationUser.Email" class="link link-primary">
+                                                @Model.ApplicationUser.Email
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="space-y-3">
+                                <div class="flex items-center p-3 bg-base-200 rounded-lg">
+                                    <i class="fas fa-phone text-astami-blue mr-3"></i>
+                                    <div>
+                                        <div class="text-sm text-base-content/70">Telefono</div>
+                                        <div class="font-semibold">
+                                            @if (!string.IsNullOrEmpty(Model.ApplicationUser.PhoneNumber))
+                                            {
+                                                <a href="tel:@Model.ApplicationUser.PhoneNumber" class="link link-primary">
+                                                    @Model.ApplicationUser.PhoneNumber
+                                                </a>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-base-content/50">Non specificato</span>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Informazioni Agenzia -->
+                <div class="card bg-base-100 shadow-xl">
+                    <div class="card-body">
+                        <h2 class="card-title text-xl mb-4">
+                            <i class="fas fa-building text-astami-orange mr-2"></i>
+                            Informazioni Agenzia
+                        </h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="flex items-center p-3 bg-base-200 rounded-lg">
+                                <i class="fas fa-building text-astami-orange mr-3"></i>
+                                <div>
+                                    <div class="text-sm text-base-content/70">Agenzia</div>
+                                    <div class="font-semibold">@Model.Agenzia.RagioneSociale</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center p-3 bg-base-200 rounded-lg">
+                                <i class="fas fa-user-tag text-astami-orange mr-3"></i>
+                                <div>
+                                    <div class="text-sm text-base-content/70">Ruolo</div>
+                                    <div class="font-semibold">@GetRoleDisplayName(Model.Ruolo)</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center p-3 bg-base-200 rounded-lg">
+                                <i class="fas fa-calendar-plus text-astami-orange mr-3"></i>
+                                <div>
+                                    <div class="text-sm text-base-content/70">Data Assegnazione</div>
+                                    <div class="font-semibold">@Model.DataAssegnazione.ToString("dd/MM/yyyy HH:mm")</div>
+                                </div>
+                            </div>
+                            <div class="flex items-center p-3 bg-base-200 rounded-lg">
+                                <i class="fas fa-check-circle text-success mr-3"></i>
+                                <div>
+                                    <div class="text-sm text-base-content/70">Stato</div>
+                                    <div class="font-semibold text-success">
+                                        @(Model.IsActive ? "Attivo" : "Disattivato")
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Attività Recenti (Placeholder per funzionalità future) -->
+                <div class="card bg-base-100 shadow-xl">
+                    <div class="card-body">
+                        <h2 class="card-title text-xl mb-4">
+                            <i class="fas fa-clock text-success mr-2"></i>
+                            Attività Recenti
+                        </h2>
+                        <div class="text-center py-8">
+                            <i class="fas fa-history text-4xl text-base-content/30 mb-4"></i>
+                            <p class="text-base-content/70">Funzionalità in arrivo</p>
+                            <p class="text-sm text-base-content/50">Qui verranno mostrate le attività recenti del collaboratore</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="space-y-6">
+                <!-- Statistiche -->
+                <div class="card bg-base-100 shadow-xl">
+                    <div class="card-body">
+                        <h3 class="card-title text-lg mb-4">
+                            <i class="fas fa-chart-bar text-info mr-2"></i>
+                            Statistiche
+                        </h3>
+                        <div class="space-y-4">
+                            <div class="stat flex flex-col lg:flex-row gap-2 lg:items-center">
+                                <div class="stat-figure text-primary">
+                                    <i class="fas fa-calendar-alt text-xl"></i>
+                                </div>
+                                <div class="flex flex-col lg:flex-row gap-2 lg:space-x-5">
+                                    <div class="flex flex-col lg:flex-row gap-2">
+                                        <div class="stat-title">Giorni in Agenzia</div>
+                                        <div class="stat-value text-primary">@((DateTime.UtcNow - Model.DataAssegnazione).Days)</div>
+                                    </div>
+                                    <div class="stat-desc">Dal @Model.DataAssegnazione.ToString("dd/MM/yyyy")</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Azioni Rapide -->
+                <div class="card bg-base-100 shadow-xl">
+                    <div class="card-body">
+                        <h3 class="card-title text-lg mb-4">
+                            <i class="fas fa-bolt text-warning mr-2"></i>
+                            Azioni Rapide
+                        </h3>
+                        <div class="space-y-2 lg:space-y-0 lg:space-x-3">
+                            <a href="mailto:@Model.ApplicationUser.Email" class="btn btn-outline btn-primary btn-block">
+                                <i class="fas fa-envelope mr-2"></i>
+                                Invia Email
+                            </a>
+                            @if (!string.IsNullOrEmpty(Model.ApplicationUser.PhoneNumber))
+                            {
+                                <a href="tel:@Model.ApplicationUser.PhoneNumber" class="btn btn-outline btn-success btn-block m-0">
+                                    <i class="fas fa-phone mr-2"></i>
+                                    Chiama
+                                </a>
+                            }
+                            <button class="btn btn-outline btn-info btn-block" style="margin: 0;" onclick="copyToClipboard('@Model.ApplicationUser.Email')">
+                                <i class="fas fa-copy mr-2"></i>
+                                Copia Email
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Permessi Ruolo -->
+                <div class="card bg-base-100 shadow-xl">
+                    <div class="card-body">
+                        <h3 class="card-title text-lg mb-4">
+                            <i class="fas fa-shield-alt text-secondary mr-2"></i>
+                            Permessi Ruolo
+                        </h3>
+                        <div class="space-y-2">
+                            @{
+                                var permessi = GetRolePermissions(Model.Ruolo);
+                            }
+                            @foreach (var permesso in permessi)
+                            {
+                                <div class="flex items-center">
+                                    <i class="fas fa-check-circle text-success mr-2"></i>
+                                    <span class="text-sm">@permesso</span>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@functions {
+    string GetRoleBadgeClass(string ruolo)
+    {
+        return ruolo switch
+        {
+            "Manager" => "badge-warning",
+            "Agente" => "badge-success",
+            "Collaboratore" => "badge-info",
+            _ => "badge-outline"
+        };
+    }
+
+    string GetRoleDisplayName(string ruolo)
+    {
+        return ruolo switch
+        {
+            "Manager" => "Manager",
+            "Agente" => "Agente",
+            "Collaboratore" => "Collaboratore",
+            _ => ruolo
+        };
+    }
+
+    List<string> GetRolePermissions(string ruolo)
+    {
+        return ruolo switch
+        {
+            "Manager" => new List<string>
+            {
+                "Gestione completa agenzia",
+                "Supervisione collaboratori",
+                "Accesso a tutti i dati",
+                "Modifica impostazioni",
+                "Gestione contratti"
+            },
+            "Agente" => new List<string>
+            {
+                "Gestione clienti",
+                "Creazione contratti",
+                "Accesso pratiche",
+                "Modifica dati clienti",
+                "Visualizzazione report"
+            },
+            "Collaboratore" => new List<string>
+            {
+                "Supporto operativo",
+                "Visualizzazione dati",
+                "Assistenza clienti",
+                "Inserimento dati base"
+            },
+            _ => new List<string> { "Nessun permesso definito" }
+        };
+    }
+}
+
+<script>
+    // Copia testo negli appunti
+    function copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(function() {
+            Swal.fire({
+                title: 'Copiato!',
+                text: 'Email copiata negli appunti',
+                icon: 'success',
+                timer: 1500,
+                showConfirmButton: false,
+                toast: true,
+                position: 'top-end'
+            });
+        }, function(err) {
+            Swal.fire({
+                title: 'Errore!',
+                text: 'Impossibile copiare il testo',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        });
+    }
+
+    // Cambia ruolo collaboratore
+    function cambiaRuolo(agenziaUtenteId, nuovoRuolo) {
+        Swal.fire({
+            title: 'Cambiare ruolo?',
+            text: `Sei sicuro di voler cambiare il ruolo a ${nuovoRuolo}?`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: 'Sì, cambia ruolo',
+            cancelButtonText: 'Annulla',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: 'Cambio ruolo in corso...',
+                    text: 'Attendere prego',
+                    icon: 'info',
+                    allowOutsideClick: false,
+                    showConfirmButton: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                fetch('@Url.Action("CambiaRuolo")', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                    },
+                    body: `agenziaUtenteId=${agenziaUtenteId}&nuovoRuolo=${nuovoRuolo}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            title: 'Ruolo modificato!',
+                            text: data.message,
+                            icon: 'success',
+                            timer: 2000,
+                            showConfirmButton: false
+                        }).then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Errore!',
+                            text: data.message,
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                })
+                .catch(error => {
+                    Swal.fire({
+                        title: 'Errore di connessione!',
+                        text: 'Si è verificato un errore durante il cambio ruolo',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                });
+            }
+        });
+    }
+
+    // Rimuovi collaboratore
+    function rimuoviCollaboratore(agenziaUtenteId, nomeCompleto) {
+        Swal.fire({
+            title: 'Rimuovere collaboratore?',
+            text: `Sei sicuro di voler rimuovere ${nomeCompleto} dai collaboratori? Questa azione può essere annullata.`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Sì, rimuovi',
+            cancelButtonText: 'Annulla',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: 'Rimozione in corso...',
+                    text: 'Attendere prego',
+                    icon: 'info',
+                    allowOutsideClick: false,
+                    showConfirmButton: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                fetch('@Url.Action("Rimuovi")', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                    },
+                    body: `agenziaUtenteId=${agenziaUtenteId}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            title: 'Rimosso!',
+                            text: data.message,
+                            icon: 'success',
+                            timer: 2000,
+                            showConfirmButton: false
+                        }).then(() => {
+                            window.location.href = '@Url.Action("Index")';
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Errore!',
+                            text: data.message,
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                })
+                .catch(error => {
+                    Swal.fire({
+                        title: 'Errore di connessione!',
+                        text: 'Si è verificato un errore durante la rimozione',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                });
+            }
+        });
+    }
+
+    // Gestisci messaggi TempData
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <text>
+            Swal.fire({
+                title: 'Successo!',
+                text: '@TempData["SuccessMessage"]',
+                icon: 'success',
+                timer: 3000,
+                showConfirmButton: false,
+                toast: true,
+                position: 'top-end'
+            });
+        </text>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <text>
+            Swal.fire({
+                title: 'Errore!',
+                text: '@TempData["ErrorMessage"]',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        </text>
+    }
+</script>
+
+@* Token per CSRF *@
+@Html.AntiForgeryToken()
