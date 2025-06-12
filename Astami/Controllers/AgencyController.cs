@@ -7,7 +7,6 @@ using Astami.Models;
 using Astami.Utilities.Constants;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
-using Stripe.BillingPortal;
 using Stripe.Checkout;
 using SessionCreateOptions = Stripe.Checkout.SessionCreateOptions;
 using SessionService = Stripe.Checkout.SessionService;
