@@ -1516,27 +1516,27 @@
 
 /* RING COLORS */
 .ring-astami-orange {
-    --tw-ring-color: var(--astami-orange);
+    outline: 2px solid var(--astami-orange);
 }
 
 .ring-astami-light-orange {
-    --tw-ring-color: var(--astami-light-orange);
+    outline: 2px solid var(--astami-light-orange);
 }
 
 .ring-astami-dark-orange {
-    --tw-ring-color: var(--astami-dark-orange);
+    outline: 2px solid var(--astami-dark-orange);
 }
 
 .ring-astami-blue {
-    --tw-ring-color: var(--astami-blue);
+    outline: 2px solid var(--astami-blue);
 }
 
 .ring-astami-light-blue {
-    --tw-ring-color: var(--astami-light-blue);
+    outline: 2px solid var(--astami-light-blue);
 }
 
 .ring-astami-dark-blue {
-    --tw-ring-color: var(--astami-dark-blue);
+    outline: 2px solid var(--astami-dark-blue);
 }
 
 /* ===== BUTTON VARIANTS ASTAMI ===== */
@@ -1752,19 +1752,19 @@
 
 /* Focus Ring Colors */
 .focus\:ring-astami-orange:focus {
-    --tw-ring-color: var(--astami-orange);
+    outline: 2px solid var(--astami-orange);
 }
 
 .focus\:ring-astami-light-orange:focus {
-    --tw-ring-color: var(--astami-light-orange);
+    outline: 2px solid var(--astami-light-orange);
 }
 
 .focus\:ring-astami-dark-orange:focus {
-    --tw-ring-color: var(--astami-dark-orange);
+    outline: 2px solid var(--astami-dark-orange);
 }
 
 .focus\:ring-astami-blue:focus {
-    --tw-ring-color: var(--astami-blue);
+    outline: 2px solid var(--astami-blue);
 }
 
 /* ===== DARK MODE MODIFIERS ===== */

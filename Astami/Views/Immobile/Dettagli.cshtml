@@ -1,0 +1,746 @@
+﻿@model Astami.Models.Immobile
+
+@{
+    ViewData["Title"] = "Dettagli Immobile";
+}
+
+<div class="min-h-screen bg-base-200 pb-7">
+    <!-- Header -->
+    <div class="gradient-bg text-white py-8">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+                <div class="flex-1">
+                    <h1 class="text-3xl font-bold mb-2">
+                        @Model.Titolo
+                    </h1>
+                    <div class="flex items-center space-x-4 text-white/80">
+                        <span>
+                            <i class="fas fa-map-marker-alt mr-1"></i>
+                            @Model.Città, @Model.Provincia
+                        </span>
+                        <span class="badge @(Model.TipoContratto == Astami.Utilities.Enum.TipoContratto.Vendita ? "badge-astami-orange" : "badge-info") badge-lg">
+                            @Model.TipoContratto.ToString()
+                        </span>
+                        <span class="badge @(Model.IsPublished ? "badge-success" : "badge-warning") badge-lg">
+                            @(Model.IsPublished ? "Pubblicato" : "Bozza")
+                        </span>
+                    </div>
+                </div>
+                <div class="mt-4 lg:mt-0 flex space-x-2">
+                    <a asp-action="Index" class="btn btn-outline btn-white">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Torna alla lista
+                    </a>
+                    <div class="dropdown dropdown-end">
+                        <div tabindex="0" role="button" class="btn btn-astami-orange">
+                            <i class="fas fa-cog mr-2"></i>
+                            Azioni
+                            <i class="fas fa-chevron-down ml-2"></i>
+                        </div>
+                        <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow-lg">
+                            <li>
+                                <a asp-action="Modifica" asp-route-id="@Model.ImmobileId">
+                                    <i class="fas fa-edit mr-2"></i>Modifica Dati
+                                </a>
+                            </li>
+                            <li>
+                                <a onclick="togglePublished('@Model.ImmobileId', @Model.IsPublished.ToString().ToLower())">
+                                    <i class="fas @(Model.IsPublished ? "fa-eye-slash" : "fa-eye") mr-2"></i>
+                                    @(Model.IsPublished ? "Nascondi" : "Pubblica")
+                                </a>
+                            </li>
+                            <div class="divider my-1"></div>
+                            <li>
+                                <a onclick="eliminaImmobile('@Model.ImmobileId', '@Model.Titolo')" class="text-error">
+                                    <i class="fas fa-trash mr-2"></i>Elimina Immobile
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mx-auto px-4 -mt-4">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Colonna Principale -->
+            <div class="lg:col-span-2 space-y-6">
+
+                <!-- Galleria Immagini -->
+                <div class="card bg-base-100 shadow-xl">
+                    <div class="card-body p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h2 class="card-title text-xl">
+                                <i class="fas fa-images text-astami-blue mr-2"></i>
+                                Galleria Immagini
+                            </h2>
+                            <button class="btn btn-astami-orange btn-sm" onclick="document.getElementById('fileInput').click()">
+                                <i class="fas fa-plus mr-2"></i>
+                                Aggiungi Foto
+                            </button>
+                        </div>
+
+                        @if (Model.Immagini.Any())
+                        {
+                            <!-- Immagine Principale -->
+                            <div class="mb-4">
+                                <div class="relative">
+                                    <img id="mainImage"
+                                         src="@Model.Immagini.FirstOrDefault(i => i.IsPrimary)?.Url"
+                                         alt="@Model.Titolo"
+                                         class="w-full h-96 object-cover rounded-lg" />
+                                    <div class="absolute top-2 right-2">
+                                        <button class="btn btn-sm btn-circle bg-black/50 border-none text-white hover:bg-black/70"
+                                                onclick="openImageModal()">
+                                            <i class="fas fa-expand"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Thumbnails -->
+                            <div class="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2">
+                                @foreach (var immagine in Model.Immagini.OrderBy(i => i.Ordine))
+                                {
+                                    <div class="relative group">
+                                        <img src="@immagine.Url"
+                                             alt="@immagine.Descrizione"
+                                             class="w-full h-16 object-cover rounded cursor-pointer hover:opacity-80 transition-opacity @(immagine.IsPrimary ? "ring-2 ring-astami-orange" : "")"
+                                             onclick="changeMainImage('@immagine.Url')" />
+                                        @if (immagine.IsPrimary)
+                                        {
+                                            <div class="absolute top-1 left-1">
+                                                <div class="badge badge-astami-orange badge-xs">Principale</div>
+                                            </div>
+                                        }
+                                        <div class="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <button class="btn btn-xs btn-circle btn-error"
+                                                    onclick="eliminaImmagine('@immagine.ImmobileImmagineId')">
+                                                <i class="fas fa-times text-xs"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="text-center py-12 bg-base-200 rounded-lg">
+                                <i class="fas fa-image text-4xl text-base-content/30 mb-4"></i>
+                                <h3 class="text-lg font-bold mb-2">Nessuna immagine</h3>
+                                <p class="text-base-content/70 mb-4">Aggiungi delle foto per rendere l'annuncio più attraente</p>
+                                <button class="btn btn-astami-orange" onclick="document.getElementById('fileInput').click()">
+                                    <i class="fas fa-plus mr-2"></i>
+                                    Aggiungi Prima Foto
+                                </button>
+                            </div>
+                        }
+
+                        <!-- File Input Hidden -->
+                        <input type="file"
+                               id="fileInput"
+                               accept="image/*"
+                               multiple
+                               style="display: none;"
+                               onchange="uploadImages()" />
+                    </div>
+                </div>
+
+                <!-- Informazioni Dettagliate -->
+                <div class="card bg-base-100 shadow-xl">
+                    <div class="card-body p-6">
+                        <h2 class="card-title text-xl mb-4">
+                            <i class="fas fa-info-circle text-astami-orange mr-2"></i>
+                            Informazioni Dettagliate
+                        </h2>
+
+                        <!-- Descrizione -->
+                        @if (!string.IsNullOrEmpty(Model.Descrizione))
+                        {
+                            <div class="mb-6">
+                                <h3 class="font-bold mb-2">Descrizione</h3>
+                                <p class="text-base-content/80 leading-relaxed">@Model.Descrizione</p>
+                            </div>
+                        }
+
+                        <!-- Caratteristiche Principali -->
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                            @if (Model.Superficie.HasValue)
+                            {
+                                <div class="text-center p-3 bg-base-200 rounded-lg">
+                                    <i class="fas fa-ruler-combined text-2xl text-astami-blue mb-2"></i>
+                                    <div class="font-bold">@Model.Superficie m²</div>
+                                    <div class="text-sm text-base-content/70">Superficie</div>
+                                </div>
+                            }
+                            @if (Model.NumeroLocali.HasValue)
+                            {
+                                <div class="text-center p-3 bg-base-200 rounded-lg">
+                                    <i class="fas fa-door-open text-2xl text-astami-orange mb-2"></i>
+                                    <div class="font-bold">@Model.NumeroLocali</div>
+                                    <div class="text-sm text-base-content/70">Locali</div>
+                                </div>
+                            }
+                            @if (Model.NumeroBagni.HasValue)
+                            {
+                                <div class="text-center p-3 bg-base-200 rounded-lg">
+                                    <i class="fas fa-bath text-2xl text-success mb-2"></i>
+                                    <div class="font-bold">@Model.NumeroBagni</div>
+                                    <div class="text-sm text-base-content/70">Bagni</div>
+                                </div>
+                            }
+                            @if (Model.Piano.HasValue)
+                            {
+                                <div class="text-center p-3 bg-base-200 rounded-lg">
+                                    <i class="fas fa-building text-2xl text-info mb-2"></i>
+                                    <div class="font-bold">@Model.Piano°</div>
+                                    <div class="text-sm text-base-content/70">Piano</div>
+                                </div>
+                            }
+                        </div>
+
+                        <!-- Caratteristiche Aggiuntive -->
+                        <div class="mb-6">
+                            <h3 class="font-bold mb-3">Caratteristiche</h3>
+                            <div class="flex flex-wrap gap-2">
+                                @if (Model.HasAscensore)
+                                {
+                                    <div class="badge badge-success gap-2">
+                                        <i class="fas fa-elevator"></i>
+                                        Ascensore
+                                    </div>
+                                }
+                                @if (Model.HasBalcone)
+                                {
+                                    <div class="badge badge-success gap-2">
+                                        <i class="fas fa-columns"></i>
+                                        Balcone
+                                    </div>
+                                }
+                                @if (Model.HasTerrazza)
+                                {
+                                    <div class="badge badge-success gap-2">
+                                        <i class="fas fa-chess-board"></i>
+                                        Terrazza
+                                    </div>
+                                }
+                                @if (Model.HasGiardino)
+                                {
+                                    <div class="badge badge-success gap-2">
+                                        <i class="fas fa-seedling"></i>
+                                        Giardino
+                                    </div>
+                                }
+                                @if (Model.HasParcheggio)
+                                {
+                                    <div class="badge badge-success gap-2">
+                                        <i class="fas fa-car"></i>
+                                        Parcheggio
+                                    </div>
+                                }
+                                @if (Model.HasCantina)
+                                {
+                                    <div class="badge badge-success gap-2">
+                                        <i class="fas fa-archive"></i>
+                                        Cantina
+                                    </div>
+                                }
+                                @if (!string.IsNullOrEmpty(Model.ClasseEnergetica))
+                                {
+                                    <div class="badge badge-info gap-2">
+                                        <i class="fas fa-leaf"></i>
+                                        Classe @Model.ClasseEnergetica
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+                        <!-- Indirizzo Completo -->
+                        <div class="border-t pt-4">
+                            <h3 class="font-bold mb-2">Ubicazione</h3>
+                            <div class="text-base-content/80">
+                                <i class="fas fa-map-marker-alt mr-2"></i>
+                                @Model.Indirizzo, @Model.Città (@Model.Provincia) @Model.CAP
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Note Private -->
+                @if (!string.IsNullOrEmpty(Model.Note))
+                {
+                    <div class="card bg-warning/10 border border-warning/20 shadow-xl">
+                        <div class="card-body p-6">
+                            <h2 class="card-title text-xl mb-4">
+                                <i class="fas fa-sticky-note text-warning mr-2"></i>
+                                Note Private
+                            </h2>
+                            <p class="text-base-content/80">@Model.Note</p>
+                            <div class="text-sm text-warning mt-2">
+                                <i class="fas fa-lock mr-1"></i>
+                                Visibile solo a te e ai tuoi collaboratori
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                <!-- Attività Correlate -->
+                <div class="card bg-base-100 shadow-xl">
+                    <div class="card-body p-6">
+                        <h2 class="card-title text-xl mb-4">
+                            <i class="fas fa-chart-line text-info mr-2"></i>
+                            Attività e Statistiche
+                        </h2>
+
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="stat">
+                                <div class="stat-figure text-primary">
+                                    <i class="fas fa-users text-2xl"></i>
+                                </div>
+                                <div class="stat-title">Lead Ricevuti</div>
+                                <div class="stat-value text-primary">@Model.Leads.Count</div>
+                                <div class="stat-desc">Richieste di contatto</div>
+                            </div>
+
+                            <div class="stat">
+                                <div class="stat-figure text-secondary">
+                                    <i class="fas fa-gavel text-2xl"></i>
+                                </div>
+                                <div class="stat-title">Aste</div>
+                                <div class="stat-value text-secondary">@Model.Aste.Count</div>
+                                <div class="stat-desc">Aste create</div>
+                            </div>
+
+                            <div class="stat">
+                                <div class="stat-figure text-accent">
+                                    <i class="fas fa-eye text-2xl"></i>
+                                </div>
+                                <div class="stat-title">Visualizzazioni</div>
+                                <div class="stat-value text-accent">--</div>
+                                <div class="stat-desc">Prossimamente</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="space-y-6">
+                <!-- Prezzo e Info Rapide -->
+                <div class="card bg-base-100 shadow-xl">
+                    <div class="card-body p-6">
+                        <h3 class="card-title text-lg mb-4">
+                            <i class="fas fa-euro-sign text-astami-orange mr-2"></i>
+                            Informazioni Economiche
+                        </h3>
+
+                        <div class="text-center mb-4">
+                            <div class="text-3xl font-bold text-astami-orange">
+                                €@Model.PrezzoBase.ToString("N0")
+                            </div>
+                            @if (Model.TipoContratto == Astami.Utilities.Enum.TipoContratto.Affitto)
+                            {
+                                <div class="text-base-content/70">/mese</div>
+                            }
+                        </div>
+
+                        @if (Model.SpeseCondominiali.HasValue && Model.SpeseCondominiali > 0)
+                        {
+                            <div class="divider"></div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm">Spese condominiali:</span>
+                                <span class="font-bold">€@Model.SpeseCondominiali.Value.ToString("N0")/mese</span>
+                            </div>
+                        }
+
+                        <div class="divider"></div>
+
+                        <!-- Tipo e Stato -->
+                        <div class="space-y-2">
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm">Tipo:</span>
+                                <span class="badge badge-outline">@Model.TipoImmobile</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm">Contratto:</span>
+                                <span class="badge @(Model.TipoContratto == Astami.Utilities.Enum.TipoContratto.Vendita ? "badge-astami-orange" : "badge-info")">
+                                    @Model.TipoContratto.ToString()
+                                </span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm">Stato:</span>
+                                <span class="badge @(Model.IsPublished ? "badge-success" : "badge-warning")">
+                                    @(Model.IsPublished ? "Pubblicato" : "Bozza")
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Azioni Rapide -->
+                <div class="card bg-base-100 shadow-xl">
+                    <div class="card-body p-6">
+                        <h3 class="card-title text-lg mb-4">
+                            <i class="fas fa-bolt text-warning mr-2"></i>
+                            Azioni Rapide
+                        </h3>
+                        <div class="space-y-2">
+                            <a asp-action="Modifica" asp-route-id="@Model.ImmobileId"
+                               class="btn btn-outline btn-primary btn-block">
+                                <i class="fas fa-edit mr-2"></i>
+                                Modifica Dati
+                            </a>
+                            <button class="btn btn-outline @(Model.IsPublished ? "btn-secondary" : "btn-success") btn-block"
+                                    onclick="togglePublished('@Model.ImmobileId', @Model.IsPublished.ToString().ToLower())">
+                                <i class="fas @(Model.IsPublished ? "fa-eye-slash" : "fa-eye") mr-2"></i>
+                                @(Model.IsPublished ? "Nascondi" : "Pubblica")
+                            </button>
+                            <button class="btn btn-outline btn-info btn-block" onclick="creaAsta()">
+                                <i class="fas fa-gavel mr-2"></i>
+                                Crea Asta
+                            </button>
+                            <button class="btn btn-outline btn-warning btn-block" onclick="duplicaImmobile()">
+                                <i class="fas fa-copy mr-2"></i>
+                                Duplica
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Informazioni Sistema -->
+                <div class="card bg-base-100 shadow-xl">
+                    <div class="card-body p-6">
+                        <h3 class="card-title text-lg mb-4">
+                            <i class="fas fa-info-circle text-info mr-2"></i>
+                            Informazioni Sistema
+                        </h3>
+                        <div class="space-y-3 text-sm">
+                            <div class="flex justify-between">
+                                <span class="text-base-content/70">Creato:</span>
+                                <span>@Model.DataCreazione.ToString("dd/MM/yyyy HH:mm")</span>
+                            </div>
+                            @if (Model.DataModifica.HasValue)
+                            {
+                                <div class="flex justify-between">
+                                    <span class="text-base-content/70">Modificato:</span>
+                                    <span>@Model.DataModifica.Value.ToString("dd/MM/yyyy HH:mm")</span>
+                                </div>
+                            }
+                            <div class="flex justify-between">
+                                <span class="text-base-content/70">ID:</span>
+                                <span class="font-mono text-xs">@Model.ImmobileId.ToString()[..8]...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal per visualizzazione immagini -->
+<div id="imageModal" class="modal">
+    <div class="modal-box w-11/12 max-w-5xl">
+        <form method="dialog">
+            <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+        </form>
+        <img id="modalImage" src="" alt="" class="w-full h-auto" />
+    </div>
+</div>
+
+<script>
+    // Gestione galleria immagini
+    function changeMainImage(url) {
+        document.getElementById('mainImage').src = url;
+    }
+
+    function openImageModal() {
+        const mainImage = document.getElementById('mainImage');
+        document.getElementById('modalImage').src = mainImage.src;
+        document.getElementById('imageModal').showModal();
+    }
+
+    // Upload immagini
+    function uploadImages() {
+        const fileInput = document.getElementById('fileInput');
+        const files = fileInput.files;
+
+        if (files.length === 0) return;
+
+        const formData = new FormData();
+        formData.append('immobileId', '@Model.ImmobileId');
+
+        for (let i = 0; i < files.length; i++) {
+            formData.append('file', files[i]);
+            formData.append('descrizione', '');
+        }
+
+        formData.append('__RequestVerificationToken',
+            document.querySelector('input[name="__RequestVerificationToken"]').value);
+
+        Swal.fire({
+            title: 'Caricamento immagini...',
+            text: 'Attendere prego',
+            icon: 'info',
+            allowOutsideClick: false,
+            showConfirmButton: false,
+            didOpen: () => {
+                Swal.showLoading();
+            }
+        });
+
+        fetch('@Url.Action("UploadImmagine")', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                Swal.fire({
+                    title: 'Immagini caricate!',
+                    text: data.message,
+                    icon: 'success',
+                    timer: 2000,
+                    showConfirmButton: false
+                }).then(() => {
+                    location.reload();
+                });
+            } else {
+                Swal.fire({
+                    title: 'Errore!',
+                    text: data.message,
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            }
+        })
+        .catch(error => {
+            Swal.fire({
+                title: 'Errore di caricamento!',
+                text: 'Si è verificato un errore durante il caricamento',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        });
+
+        // Reset input
+        fileInput.value = '';
+    }
+
+    // Elimina immagine
+    function eliminaImmagine(immagineId) {
+        Swal.fire({
+            title: 'Eliminare immagine?',
+            text: 'Questa azione non può essere annullata',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Sì, elimina',
+            cancelButtonText: 'Annulla',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch('@Url.Action("EliminaImmagine")', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                    },
+                    body: `immagineId=${immagineId}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            title: 'Eliminata!',
+                            text: data.message,
+                            icon: 'success',
+                            timer: 1500,
+                            showConfirmButton: false
+                        }).then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Errore!',
+                            text: data.message,
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                });
+            }
+        });
+    }
+
+    // Toggle published status
+    function togglePublished(immobileId, currentStatus) {
+        const newStatus = !currentStatus;
+        const action = newStatus ? 'pubblicare' : 'nascondere';
+
+        Swal.fire({
+            title: `${action.charAt(0).toUpperCase() + action.slice(1)} immobile?`,
+            text: `Sei sicuro di voler ${action} questo immobile?`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: `Sì, ${action}`,
+            cancelButtonText: 'Annulla',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: 'Aggiornamento in corso...',
+                    text: 'Attendere prego',
+                    icon: 'info',
+                    allowOutsideClick: false,
+                    showConfirmButton: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                fetch('@Url.Action("CambiaStato")', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                    },
+                    body: `immobileId=${immobileId}&isPublished=${newStatus}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            title: 'Stato aggiornato!',
+                            text: data.message,
+                            icon: 'success',
+                            timer: 2000,
+                            showConfirmButton: false
+                        }).then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Errore!',
+                            text: data.message,
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                });
+            }
+        });
+    }
+
+    // Elimina immobile
+    function eliminaImmobile(immobileId, titolo) {
+        Swal.fire({
+            title: 'Eliminare immobile?',
+            text: `Sei sicuro di voler eliminare "${titolo}"? Questa azione non può essere annullata.`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Sì, elimina',
+            cancelButtonText: 'Annulla',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: 'Eliminazione in corso...',
+                    text: 'Attendere prego',
+                    icon: 'info',
+                    allowOutsideClick: false,
+                    showConfirmButton: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                fetch('@Url.Action("Elimina")', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                    },
+                    body: `immobileId=${immobileId}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            title: 'Eliminato!',
+                            text: data.message,
+                            icon: 'success',
+                            timer: 2000,
+                            showConfirmButton: false
+                        }).then(() => {
+                            window.location.href = '@Url.Action("Index")';
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Errore!',
+                            text: data.message,
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                });
+            }
+        });
+    }
+
+    // Placeholder per funzioni future
+    function creaAsta() {
+        Swal.fire({
+            title: 'Funzione in arrivo',
+            text: 'La creazione di aste sarà disponibile presto!',
+            icon: 'info',
+            confirmButtonText: 'OK'
+        });
+    }
+
+    function duplicaImmobile() {
+        Swal.fire({
+            title: 'Funzione in arrivo',
+            text: 'La duplicazione di immobili sarà disponibile presto!',
+            icon: 'info',
+            confirmButtonText: 'OK'
+        });
+    }
+
+    // Gestisci messaggi TempData
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <text>
+                Swal.fire({
+                    title: 'Successo!',
+                    text: '@TempData["SuccessMessage"]',
+                    icon: 'success',
+                    timer: 3000,
+                    showConfirmButton: false,
+                    toast: true,
+                    position: 'top-end'
+                });
+        </text>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <text>
+                Swal.fire({
+                    title: 'Errore!',
+                    text: '@TempData["ErrorMessage"]',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+        </text>
+    }
+</script>
+
+@* Token per CSRF *@
+@Html.AntiForgeryToken()

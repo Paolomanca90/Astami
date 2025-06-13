@@ -1,0 +1,517 @@
+﻿@model Astami.Controllers.AggiungiImmobileViewModel
+
+@{
+    ViewData["Title"] = "Aggiungi Immobile";
+}
+
+<div class="min-h-screen bg-base-200 pb-7">
+    <!-- Header -->
+    <div class="gradient-bg text-white py-8">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold mb-2">
+                        <i class="fas fa-plus-circle mr-3"></i>
+                        Aggiungi Immobile
+                    </h1>
+                    <p class="text-white/80">
+                        Inserisci i dettagli del nuovo immobile
+                    </p>
+                </div>
+                <div>
+                    <a asp-action="Index" class="btn btn-outline btn-white">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Torna alla lista
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mx-auto px-4 -mt-4">
+        <div class="max-w-4xl mx-auto">
+            <div class="card bg-base-100 shadow-xl">
+                <div class="card-body p-8">
+                    <form asp-action="Aggiungi" method="post" class="space-y-8" id="immobileForm">
+                        @Html.AntiForgeryToken()
+                        @Html.HiddenFor(m => m.AgenziaId)
+
+                        <!-- Validation Summary -->
+                        @if (!ViewData.ModelState.IsValid)
+                        {
+                            <div class="alert alert-error">
+                                <div>
+                                    <i class="fas fa-exclamation-triangle mr-2"></i>
+                                    <strong>Attenzione!</strong> Correggi i seguenti errori:
+                                    <div asp-validation-summary="ModelOnly" class="mt-2"></div>
+                                </div>
+                            </div>
+                        }
+
+                        <!-- Informazioni Base -->
+                        <div class="border-l-4 border-astami-blue pl-4">
+                            <h3 class="text-lg font-semibold mb-4 text-astami-blue">
+                                <i class="fas fa-info-circle mr-2"></i>
+                                Informazioni Base
+                            </h3>
+
+                            <div class="grid grid-cols-1 gap-4">
+                                <div class="form-control flex flex-col w-full">
+                                    <label asp-for="Titolo" class="label label-text font-medium">
+                                        <i class="fas fa-tag mr-2"></i>
+                                        Titolo Annuncio *
+                                    </label>
+                                    <input asp-for="Titolo" class="input input-bordered w-full"
+                                           placeholder="Es. Appartamento moderno in centro città" />
+                                    <span asp-validation-for="Titolo" class="text-error text-sm mt-1"></span>
+                                </div>
+
+                                <div class="form-control flex flex-col w-full">
+                                    <label asp-for="Descrizione" class="label label-text font-medium">
+                                        <i class="fas fa-align-left mr-2"></i>
+                                        Descrizione
+                                    </label>
+                                    <textarea asp-for="Descrizione" class="textarea focus:ring-astami-orange w-full"
+                                              rows="4" placeholder="Descrivi le caratteristiche principali dell'immobile..."></textarea>
+                                    <span asp-validation-for="Descrizione" class="text-error text-sm mt-1"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tipo e Contratto -->
+                        <div class="border-l-4 border-astami-orange pl-4">
+                            <h3 class="text-lg font-semibold mb-4 text-astami-orange">
+                                <i class="fas fa-handshake mr-2"></i>
+                                Tipo e Contratto
+                            </h3>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="form-control">
+                                    <label asp-for="TipoContratto" class="label label-text font-medium">
+                                        <i class="fas fa-file-contract mr-2"></i>
+                                        Tipo Contratto *
+                                    </label>
+                                    <select asp-for="TipoContratto" class="select select-bordered w-full">
+                                        <option value="">Seleziona tipo contratto</option>
+                                        <option value="@((int)Astami.Utilities.Enum.TipoContratto.Affitto)">Affitto</option>
+                                        <option value="@((int)Astami.Utilities.Enum.TipoContratto.Vendita)">Vendita</option>
+                                    </select>
+                                    <span asp-validation-for="TipoContratto" class="text-error text-sm mt-1"></span>
+                                </div>
+
+                                <div class="form-control">
+                                    <label asp-for="TipoImmobile" class="label label-text font-medium">
+                                        <i class="fas fa-home mr-2"></i>
+                                        Tipo Immobile *
+                                    </label>
+                                    <select asp-for="TipoImmobile" class="select select-bordered w-full">
+                                        <option value="">Seleziona tipo immobile</option>
+                                        <option value="@((int)Astami.Utilities.Enum.TipoImmobile.Appartamento)">Appartamento</option>
+                                        <option value="@((int)Astami.Utilities.Enum.TipoImmobile.Villa)">Villa</option>
+                                        <option value="@((int)Astami.Utilities.Enum.TipoImmobile.Villetta)">Villetta</option>
+                                        <option value="@((int)Astami.Utilities.Enum.TipoImmobile.Attico)">Attico</option>
+                                        <option value="@((int)Astami.Utilities.Enum.TipoImmobile.Loft)">Loft</option>
+                                        <option value="@((int)Astami.Utilities.Enum.TipoImmobile.Monolocale)">Monolocale</option>
+                                        <option value="@((int)Astami.Utilities.Enum.TipoImmobile.Bilocale)">Bilocale</option>
+                                        <option value="@((int)Astami.Utilities.Enum.TipoImmobile.Trilocale)">Trilocale</option>
+                                        <option value="@((int)Astami.Utilities.Enum.TipoImmobile.Quadrilocale)">Quadrilocale</option>
+                                        <option value="@((int)Astami.Utilities.Enum.TipoImmobile.Ufficio)">Ufficio</option>
+                                        <option value="@((int)Astami.Utilities.Enum.TipoImmobile.Negozio)">Negozio</option>
+                                        <option value="@((int)Astami.Utilities.Enum.TipoImmobile.Locale)">Locale</option>
+                                        <option value="@((int)Astami.Utilities.Enum.TipoImmobile.Magazzino)">Magazzino</option>
+                                        <option value="@((int)Astami.Utilities.Enum.TipoImmobile.Garage)">Garage</option>
+                                        <option value="@((int)Astami.Utilities.Enum.TipoImmobile.Terreno)">Terreno</option>
+                                        <option value="@((int)Astami.Utilities.Enum.TipoImmobile.Altro)">Altro</option>
+                                    </select>
+                                    <span asp-validation-for="TipoImmobile" class="text-error text-sm mt-1"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Ubicazione -->
+                        <div class="border-l-4 border-success pl-4">
+                            <h3 class="text-lg font-semibold mb-4 text-success">
+                                <i class="fas fa-map-marker-alt mr-2"></i>
+                                Ubicazione
+                            </h3>
+
+                            <div class="grid grid-cols-1 gap-4">
+                                <div class="form-control flex flex-col w-full">
+                                    <label asp-for="Indirizzo" class="label label-text font-medium">
+                                        <i class="fas fa-road mr-2"></i>
+                                        Indirizzo *
+                                    </label>
+                                    <input asp-for="Indirizzo" class="input input-bordered w-full"
+                                           placeholder="Via/Piazza e numero civico" />
+                                    <span asp-validation-for="Indirizzo" class="text-error text-sm mt-1"></span>
+                                </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div class="form-control">
+                                        <label asp-for="Città" class="label label-text font-medium">
+                                            <i class="fas fa-city mr-2"></i>
+                                            Città *
+                                        </label>
+                                        <input asp-for="Città" class="input input-bordered"
+                                               placeholder="Milano" />
+                                        <span asp-validation-for="Città" class="text-error text-sm mt-1"></span>
+                                    </div>
+
+                                    <div class="form-control">
+                                        <label asp-for="Provincia" class="label label-text font-medium">
+                                            <i class="fas fa-map mr-2"></i>
+                                            Provincia
+                                        </label>
+                                        <input asp-for="Provincia" class="input input-bordered"
+                                               placeholder="MI" />
+                                        <span asp-validation-for="Provincia" class="text-error text-sm mt-1"></span>
+                                    </div>
+
+                                    <div class="form-control">
+                                        <label asp-for="CAP" class="label label-text font-medium">
+                                            <i class="fas fa-mail-bulk mr-2"></i>
+                                            CAP *
+                                        </label>
+                                        <input asp-for="CAP" class="input input-bordered"
+                                               placeholder="20100" pattern="[0-9]{5}" />
+                                        <span asp-validation-for="CAP" class="text-error text-sm mt-1"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Prezzo e Caratteristiche -->
+                        <div class="border-l-4 border-warning pl-4">
+                            <h3 class="text-lg font-semibold mb-4 text-warning">
+                                <i class="fas fa-euro-sign mr-2"></i>
+                                Prezzo e Caratteristiche
+                            </h3>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                <div class="form-control">
+                                    <label asp-for="PrezzoBase" class="label label-text font-medium">
+                                        <i class="fas fa-tags mr-2"></i>
+                                        Prezzo *
+                                    </label>
+                                    <div class="input-group flex gap-2">
+                                        <span class="bg-base-200 px-3 flex items-center border border-r-0 border-base-300 rounded-l-lg">€</span>
+                                        <input asp-for="PrezzoBase" type="number" step="0.01" class="input input-bordered flex-1"
+                                               placeholder="150000" />
+                                    </div>
+                                    <span asp-validation-for="PrezzoBase" class="text-error text-sm mt-1"></span>
+                                </div>
+
+                                <div class="form-control">
+                                    <label asp-for="Superficie" class="label label-text font-medium">
+                                        <i class="fas fa-ruler-combined mr-2"></i>
+                                        Superficie (m²)
+                                    </label>
+                                    <input asp-for="Superficie" type="number" class="input input-bordered"
+                                           placeholder="85" />
+                                    <span asp-validation-for="Superficie" class="text-error text-sm mt-1"></span>
+                                </div>
+
+                                <div class="form-control">
+                                    <label asp-for="NumeroLocali" class="label label-text font-medium">
+                                        <i class="fas fa-door-open mr-2"></i>
+                                        Numero Locali
+                                    </label>
+                                    <input asp-for="NumeroLocali" type="number" class="input input-bordered"
+                                           placeholder="3" />
+                                    <span asp-validation-for="NumeroLocali" class="text-error text-sm mt-1"></span>
+                                </div>
+
+                                <div class="form-control">
+                                    <label asp-for="NumeroBagni" class="label label-text font-medium">
+                                        <i class="fas fa-bath mr-2"></i>
+                                        Numero Bagni
+                                    </label>
+                                    <input asp-for="NumeroBagni" type="number" class="input input-bordered"
+                                           placeholder="2" />
+                                    <span asp-validation-for="NumeroBagni" class="text-error text-sm mt-1"></span>
+                                </div>
+
+                                <div class="form-control">
+                                    <label asp-for="Piano" class="label label-text font-medium">
+                                        <i class="fas fa-building mr-2"></i>
+                                        Piano
+                                    </label>
+                                    <input asp-for="Piano" type="number" class="input input-bordered"
+                                           placeholder="2" />
+                                    <span asp-validation-for="Piano" class="text-error text-sm mt-1"></span>
+                                </div>
+
+                                <div class="form-control">
+                                    <label asp-for="ClasseEnergetica" class="label label-text font-medium">
+                                        <i class="fas fa-leaf mr-2"></i>
+                                        Classe Energetica
+                                    </label>
+                                    <select asp-for="ClasseEnergetica" class="select select-bordered">
+                                        <option value="">Seleziona classe</option>
+                                        <option value="A4">A4</option>
+                                        <option value="A3">A3</option>
+                                        <option value="A2">A2</option>
+                                        <option value="A1">A1</option>
+                                        <option value="B">B</option>
+                                        <option value="C">C</option>
+                                        <option value="D">D</option>
+                                        <option value="E">E</option>
+                                        <option value="F">F</option>
+                                        <option value="G">G</option>
+                                    </select>
+                                    <span asp-validation-for="ClasseEnergetica" class="text-error text-sm mt-1"></span>
+                                </div>
+                            </div>
+
+                            <!-- Spese aggiuntive -->
+                            <div class="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                <div class="form-control">
+                                    <label asp-for="SpeseCondominiali" class="label label-text font-medium">
+                                        <i class="fas fa-building mr-2"></i>
+                                        Spese Condominiali (€/mese)
+                                    </label>
+                                    <input asp-for="SpeseCondominiali" type="number" step="0.01" class="input input-bordered"
+                                           placeholder="120" />
+                                    <span asp-validation-for="SpeseCondominiali" class="text-error text-sm mt-1"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Caratteristiche Aggiuntive -->
+                        <div class="border-l-4 border-info pl-4">
+                            <h3 class="text-lg font-semibold mb-4 text-info">
+                                <i class="fas fa-star mr-2"></i>
+                                Caratteristiche Aggiuntive
+                            </h3>
+
+                            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                                <div class="form-control">
+                                    <label class="label cursor-pointer justify-start gap-3">
+                                        <input asp-for="HasAscensore" type="checkbox" class="checkbox checkbox-astami-orange" />
+                                        <span class="label-text">
+                                            <i class="fas fa-elevator mr-2"></i>
+                                            Ascensore
+                                        </span>
+                                    </label>
+                                </div>
+
+                                <div class="form-control">
+                                    <label class="label cursor-pointer justify-start gap-3">
+                                        <input asp-for="HasBalcone" type="checkbox" class="checkbox checkbox-astami-orange" />
+                                        <span class="label-text">
+                                            <i class="fas fa-columns mr-2"></i>
+                                            Balcone
+                                        </span>
+                                    </label>
+                                </div>
+
+                                <div class="form-control">
+                                    <label class="label cursor-pointer justify-start gap-3">
+                                        <input asp-for="HasTerrazza" type="checkbox" class="checkbox checkbox-astami-orange" />
+                                        <span class="label-text">
+                                            <i class="fas fa-chess-board mr-2"></i>
+                                            Terrazza
+                                        </span>
+                                    </label>
+                                </div>
+
+                                <div class="form-control">
+                                    <label class="label cursor-pointer justify-start gap-3">
+                                        <input asp-for="HasGiardino" type="checkbox" class="checkbox checkbox-astami-orange" />
+                                        <span class="label-text">
+                                            <i class="fas fa-seedling mr-2"></i>
+                                            Giardino
+                                        </span>
+                                    </label>
+                                </div>
+
+                                <div class="form-control">
+                                    <label class="label cursor-pointer justify-start gap-3">
+                                        <input asp-for="HasParcheggio" type="checkbox" class="checkbox checkbox-astami-orange" />
+                                        <span class="label-text">
+                                            <i class="fas fa-car mr-2"></i>
+                                            Parcheggio
+                                        </span>
+                                    </label>
+                                </div>
+
+                                <div class="form-control">
+                                    <label class="label cursor-pointer justify-start gap-3">
+                                        <input asp-for="HasCantina" type="checkbox" class="checkbox checkbox-astami-orange" />
+                                        <span class="label-text">
+                                            <i class="fas fa-archive mr-2"></i>
+                                            Cantina
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Note -->
+                        <div class="border-l-4 border-secondary pl-4">
+                            <h3 class="text-lg font-semibold mb-4 text-secondary">
+                                <i class="fas fa-sticky-note mr-2"></i>
+                                Note Aggiuntive
+                            </h3>
+
+                            <div class="form-control flex flex-col w-full">
+                                <label asp-for="Note" class="label label-text font-medium">
+                                    <i class="fas fa-comment mr-2"></i>
+                                    Note Private
+                                </label>
+                                <textarea asp-for="Note" class="textarea focus:ring-astami-orange w-full"
+                                          rows="3" placeholder="Note interne visibili solo a te e ai tuoi collaboratori..."></textarea>
+                                <span asp-validation-for="Note" class="text-error text-sm mt-1"></span>
+                                <div class="label">
+                                    <span class="label-text-alt text-base-content/60">
+                                        <i class="fas fa-info-circle mr-1"></i>
+                                        Queste note non saranno visibili nei annunci pubblici
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Azioni -->
+                        <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t">
+                            <button type="submit" class="btn btn-astami-blue flex-1">
+                                <i class="fas fa-save mr-2"></i>
+                                Salva Immobile
+                            </button>
+                            <a asp-action="Index" class="btn btn-outline flex-1">
+                                <i class="fas fa-times mr-2"></i>
+                                Annulla
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Info Card -->
+            <div class="card bg-info text-info-content mt-6">
+                <div class="card-body">
+                    <h3 class="card-title">
+                        <i class="fas fa-lightbulb mr-2"></i>
+                        Suggerimenti
+                    </h3>
+                    <ul class="list-disc list-inside space-y-1 text-sm">
+                        <li>Scrivi un titolo accattivante che descriva le caratteristiche principali</li>
+                        <li>Nella descrizione, evidenzia i punti di forza dell'immobile e della zona</li>
+                        <li>Verifica che l'indirizzo sia corretto - sarà utilizzato per la mappa</li>
+                        <li>Dopo aver salvato l'immobile, potrai aggiungere foto e documenti</li>
+                        <li>L'immobile sarà salvato come bozza - potrai pubblicarlo successivamente</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Form validation and enhancements
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('immobileForm');
+
+        // Auto-uppercase per CAP e provincia
+        document.querySelector('input[name="CAP"]').addEventListener('input', function() {
+            this.value = this.value.replace(/\D/g, '');
+        });
+
+        document.querySelector('input[name="Provincia"]').addEventListener('input', function() {
+            this.value = this.value.toUpperCase();
+        });
+
+        // Validazione prezzi
+        const prezzoInput = document.querySelector('input[name="PrezzoBase"]');
+        prezzoInput.addEventListener('input', function() {
+            if (this.value < 0) {
+                this.value = 0;
+            }
+        });
+
+        const speseInput = document.querySelector('input[name="SpeseCondominiali"]');
+        if (speseInput) {
+            speseInput.addEventListener('input', function() {
+                if (this.value < 0) {
+                    this.value = 0;
+                }
+            });
+        }
+
+        // Formattazione numero con separatori
+        function formatNumber(input) {
+            let value = input.value.replace(/[^\d.]/g, '');
+            if (value !== '') {
+                value = parseFloat(value).toLocaleString('it-IT');
+                input.value = value;
+            }
+        }
+
+        // Form submission con SweetAlert
+        form.addEventListener('submit', function(e) {
+            const requiredFields = ['Titolo', 'Indirizzo', 'Città', 'CAP', 'PrezzoBase'];
+            const emptyFields = [];
+
+            requiredFields.forEach(field => {
+                const input = document.querySelector(`input[name="${field}"], select[name="${field}"], textarea[name="${field}"]`);
+                if (input && !input.value.trim()) {
+                    emptyFields.push(field);
+                }
+            });
+
+            if (emptyFields.length > 0) {
+                e.preventDefault();
+                Swal.fire({
+                    title: 'Campi obbligatori mancanti!',
+                    html: `I seguenti campi sono obbligatori:<br><strong>${emptyFields.join(', ')}</strong>`,
+                    icon: 'warning',
+                    confirmButtonText: 'OK'
+                });
+                return;
+            }
+
+            // Mostra loading durante l'invio
+            Swal.fire({
+                title: 'Salvataggio immobile...',
+                text: 'Attendere prego',
+                icon: 'info',
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+        });
+    });
+
+    // Gestisci messaggi TempData
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <text>
+            Swal.fire({
+                title: 'Successo!',
+                text: '@TempData["SuccessMessage"]',
+                icon: 'success',
+                timer: 3000,
+                showConfirmButton: false,
+                toast: true,
+                position: 'top-end'
+            });
+        </text>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <text>
+            Swal.fire({
+                title: 'Errore!',
+                text: '@TempData["ErrorMessage"]',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        </text>
+    }
+</script>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

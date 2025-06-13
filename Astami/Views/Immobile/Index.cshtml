@@ -1,0 +1,739 @@
+﻿@model Astami.Controllers.ImmobiliIndexViewModel
+
+@{
+    ViewData["Title"] = "Gestione Immobili";
+}
+
+<div class="min-h-screen bg-base-200 pb-7">
+    <!-- Header -->
+    <div class="gradient-bg text-white py-8">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+                <div>
+                    <h1 class="text-3xl font-bold mb-2">
+                        <i class="fas fa-home mr-3"></i>
+                        Gestione Immobili
+                    </h1>
+                    <p class="text-white/80">
+                        <i class="fas fa-building mr-2"></i>
+                        @Model.Agenzia.RagioneSociale
+                    </p>
+                </div>
+                <div class="mt-4 lg:mt-0">
+                    <a asp-action="Aggiungi" class="btn btn-astami-orange btn-lg shadow-astami-orange">
+                        <i class="fas fa-plus mr-2"></i>
+                        Aggiungi Immobile
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mx-auto px-4 -mt-4">
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="card bg-base-100 shadow-xl">
+                <div class="card-body p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-sm font-medium text-base-content/70">Totale Immobili</h3>
+                            <p class="text-3xl font-bold text-astami-blue">@Model.Immobili.Count</p>
+                        </div>
+                        <div class="w-12 h-12 bg-astami-blue/10 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-home text-astami-blue text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card bg-base-100 shadow-xl">
+                <div class="card-body p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-sm font-medium text-base-content/70">Pubblicati</h3>
+                            <p class="text-3xl font-bold text-success">@Model.Immobili.Count(i => i.IsPublished)</p>
+                        </div>
+                        <div class="w-12 h-12 bg-success/10 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-eye text-success text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card bg-base-100 shadow-xl">
+                <div class="card-body p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-sm font-medium text-base-content/70">In Vendita</h3>
+                            <p class="text-3xl font-bold text-astami-orange">@Model.Immobili.Count(i => i.TipoContratto == Astami.Utilities.Enum.TipoContratto.Vendita)</p>
+                        </div>
+                        <div class="w-12 h-12 bg-astami-orange/10 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-handshake text-astami-orange text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card bg-base-100 shadow-xl">
+                <div class="card-body p-6">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-sm font-medium text-base-content/70">In Affitto</h3>
+                            <p class="text-3xl font-bold text-info">@Model.Immobili.Count(i => i.TipoContratto == Astami.Utilities.Enum.TipoContratto.Affitto)</p>
+                        </div>
+                        <div class="w-12 h-12 bg-info/10 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-key text-info text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filtri e Ricerca -->
+        <div class="card bg-base-100 shadow-xl mb-8">
+            <div class="card-body p-6">
+                <div class="flex flex-col lg:flex-row gap-4 items-end">
+                    <div class="form-control flex-1">
+                        <label class="label">
+                            <span class="label-text font-medium">Cerca immobili</span>
+                        </label>
+                        <input type="text" placeholder="Cerca per titolo, città o indirizzo..."
+                               class="input input-bordered w-full" id="searchInput" />
+                    </div>
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text font-medium">Tipo Contratto</span>
+                        </label>
+                        <select class="select select-bordered" id="contractFilter">
+                            <option value="">Tutti</option>
+                            <option value="Vendita">Vendita</option>
+                            <option value="Affitto">Affitto</option>
+                        </select>
+                    </div>
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text font-medium">Stato</span>
+                        </label>
+                        <select class="select select-bordered" id="statusFilter">
+                            <option value="">Tutti</option>
+                            <option value="published">Pubblicati</option>
+                            <option value="draft">Bozze</option>
+                        </select>
+                    </div>
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text font-medium">Ordina per</span>
+                        </label>
+                        <select class="select select-bordered" id="sortFilter">
+                            <option value="newest">Più recenti</option>
+                            <option value="oldest">Più vecchi</option>
+                            <option value="price-asc">Prezzo crescente</option>
+                            <option value="price-desc">Prezzo decrescente</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista Immobili -->
+        <div class="card bg-base-100 shadow-xl">
+            <div class="card-body p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="card-title text-xl">
+                        <i class="fas fa-list text-astami-blue mr-2"></i>
+                        I tuoi Immobili
+                    </h2>
+                    <div class="flex items-center gap-2">
+                        <div class="btn-group">
+                            <button class="btn btn-sm btn-active" id="gridViewBtn">
+                                <i class="fas fa-th-large"></i>
+                            </button>
+                            <button class="btn btn-sm" id="listViewBtn">
+                                <i class="fas fa-list"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                @if (Model.Immobili.Any())
+                {
+                    <!-- Grid View -->
+                    <div id="gridView" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        @foreach (var immobile in Model.Immobili.OrderByDescending(i => i.DataCreazione))
+                        {
+                            <div class="card bg-base-100 shadow-lg card-hover immobile-card"
+                                 data-title="@immobile.Titolo.ToLower()"
+                                 data-city="@immobile.Città.ToLower()"
+                                 data-address="@immobile.Indirizzo.ToLower()"
+                                 data-contract="@immobile.TipoContratto.ToString()"
+                                 data-published="@immobile.IsPublished.ToString().ToLower()"
+                                 data-price="@immobile.PrezzoBase"
+                                 data-date="@immobile.DataCreazione.Ticks">
+                                <figure class="relative h-48">
+                                    @if (immobile.Immagini.Any())
+                                    {
+                                        <img src="@immobile.Immagini.FirstOrDefault(i => i.IsPrimary)?.Url"
+                                             alt="@immobile.Titolo"
+                                             class="w-full h-full object-cover" />
+                                    }
+                                    else
+                                    {
+                                        <div class="w-full h-full bg-base-200 flex items-center justify-center">
+                                            <i class="fas fa-image text-4xl text-base-content/30"></i>
+                                        </div>
+                                    }
+
+                                    <!-- Status Badge -->
+                                    <div class="absolute top-2 left-2">
+                                        @if (immobile.IsPublished)
+                                        {
+                                            <div class="badge badge-success">Pubblicato</div>
+                                        }
+                                        else
+                                        {
+                                            <div class="badge badge-warning">Bozza</div>
+                                        }
+                                    </div>
+
+                                    <!-- Contract Type Badge -->
+                                    <div class="absolute top-2 right-2">
+                                        <div class="badge @(immobile.TipoContratto == Astami.Utilities.Enum.TipoContratto.Vendita ? "badge-astami-orange" : "badge-info")">
+                                            @immobile.TipoContratto.ToString()
+                                        </div>
+                                    </div>
+
+                                    <!-- Actions -->
+                                    <div class="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <div class="flex gap-1">
+                                            <button class="btn btn-sm btn-circle bg-black/50 border-none text-white hover:bg-black/70"
+                                                    onclick="togglePublished('@immobile.ImmobileId', @immobile.IsPublished.ToString().ToLower())">
+                                                <i class="fas @(immobile.IsPublished ? "fa-eye-slash" : "fa-eye")"></i>
+                                            </button>
+                                            <a href="@Url.Action("Dettagli", new { id = immobile.ImmobileId })"
+                                               class="btn btn-sm btn-circle bg-black/50 border-none text-white hover:bg-black/70">
+                                                <i class="fas fa-info"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </figure>
+
+                                <div class="card-body p-4">
+                                    <h3 class="card-title text-lg font-bold line-clamp-2">@immobile.Titolo</h3>
+                                    <p class="text-sm text-base-content/70 mb-2">
+                                        <i class="fas fa-map-marker-alt mr-1"></i>
+                                        @immobile.Città, @immobile.Provincia
+                                    </p>
+
+                                    <!-- Property Features -->
+                                    <div class="flex flex-wrap gap-1 mb-3">
+                                        @if (immobile.NumeroLocali.HasValue)
+                                        {
+                                            <span class="badge badge-outline badge-sm">@immobile.NumeroLocali locali</span>
+                                        }
+                                        @if (immobile.Superficie.HasValue)
+                                        {
+                                            <span class="badge badge-outline badge-sm">@immobile.Superficie m²</span>
+                                        }
+                                        @if (immobile.Piano.HasValue)
+                                        {
+                                            <span class="badge badge-outline badge-sm">@immobile.Piano° piano</span>
+                                        }
+                                    </div>
+
+                                    <!-- Price -->
+                                    <div class="flex justify-between items-center">
+                                        <div>
+                                            <div class="text-xl font-bold text-astami-orange">
+                                                €@immobile.PrezzoBase.ToString("N0")
+                                            </div>
+                                            @if (immobile.TipoContratto == Astami.Utilities.Enum.TipoContratto.Affitto)
+                                            {
+                                                <div class="text-xs text-base-content/70">/mese</div>
+                                            }
+                                        </div>
+                                        <div class="dropdown dropdown-end">
+                                            <div tabindex="0" role="button" class="btn btn-sm btn-circle btn-ghost">
+                                                <i class="fas fa-ellipsis-v"></i>
+                                            </div>
+                                            <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow-lg border">
+                                                <li>
+                                                    <a href="@Url.Action("Dettagli", new { id = immobile.ImmobileId })">
+                                                        <i class="fas fa-eye mr-2"></i>Visualizza
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a href="@Url.Action("Modifica", new { id = immobile.ImmobileId })">
+                                                        <i class="fas fa-edit mr-2"></i>Modifica
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a onclick="togglePublished('@immobile.ImmobileId', @immobile.IsPublished.ToString().ToLower())">
+                                                        <i class="fas @(immobile.IsPublished ? "fa-eye-slash" : "fa-eye") mr-2"></i>
+                                                        @(immobile.IsPublished ? "Nascondi" : "Pubblica")
+                                                    </a>
+                                                </li>
+                                                <div class="divider my-1"></div>
+                                                <li>
+                                                    <a onclick="eliminaImmobile('@immobile.ImmobileId', '@immobile.Titolo')" class="text-error">
+                                                        <i class="fas fa-trash mr-2"></i>Elimina
+                                                    </a>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    <!-- List View (Initially Hidden) -->
+                    <div id="listView" class="hidden">
+                        <div class="overflow-x-auto">
+                            <table class="table table-zebra w-full">
+                                <thead>
+                                    <tr>
+                                        <th>Immobile</th>
+                                        <th>Ubicazione</th>
+                                        <th>Tipo/Contratto</th>
+                                        <th>Prezzo</th>
+                                        <th>Stato</th>
+                                        <th>Azioni</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var immobile in Model.Immobili.OrderByDescending(i => i.DataCreazione))
+                                    {
+                                        <tr class="immobile-row"
+                                            data-title="@immobile.Titolo.ToLower()"
+                                            data-city="@immobile.Città.ToLower()"
+                                            data-address="@immobile.Indirizzo.ToLower()"
+                                            data-contract="@immobile.TipoContratto.ToString()"
+                                            data-published="@immobile.IsPublished.ToString().ToLower()"
+                                            data-price="@immobile.PrezzoBase"
+                                            data-date="@immobile.DataCreazione.Ticks">
+                                            <td>
+                                                <div class="flex items-center space-x-3">
+                                                    <div class="avatar">
+                                                        <div class="w-16 h-16 rounded">
+                                                            @if (immobile.Immagini.Any())
+                                                            {
+                                                                <img src="@immobile.Immagini.FirstOrDefault(i => i.IsPrimary)?.Url"
+                                                                     alt="@immobile.Titolo"
+                                                                     class="w-full h-full object-cover" />
+                                                            }
+                                                            else
+                                                            {
+                                                                <div class="w-full h-full bg-base-200 flex items-center justify-center">
+                                                                    <i class="fas fa-image text-base-content/30"></i>
+                                                                </div>
+                                                            }
+                                                        </div>
+                                                    </div>
+                                                    <div>
+                                                        <div class="font-bold">@immobile.Titolo</div>
+                                                        <div class="text-sm opacity-80">
+                                                            @if (immobile.NumeroLocali.HasValue && immobile.Superficie.HasValue)
+                                                            {
+                                                                <span>@immobile.NumeroLocali locali • @immobile.Superficie m²</span>
+                                                            }
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="text-sm">
+                                                    <div class="font-medium">@immobile.Città</div>
+                                                    <div class="text-base-content/70">@immobile.Provincia</div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="space-y-1">
+                                                    <div class="badge badge-outline">@immobile.TipoImmobile</div>
+                                                    <div class="badge @(immobile.TipoContratto == Astami.Utilities.Enum.TipoContratto.Vendita ? "badge-astami-orange" : "badge-info") badge-sm">
+                                                        @immobile.TipoContratto.ToString()
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="text-lg font-bold text-astami-orange">
+                                                    €@immobile.PrezzoBase.ToString("N0")
+                                                </div>
+                                                @if (immobile.TipoContratto == Astami.Utilities.Enum.TipoContratto.Affitto)
+                                                {
+                                                    <div class="text-xs text-base-content/70">/mese</div>
+                                                }
+                                            </td>
+                                            <td>
+                                                @if (immobile.IsPublished)
+                                                {
+                                                    <div class="badge badge-success">Pubblicato</div>
+                                                }
+                                                else
+                                                {
+                                                    <div class="badge badge-warning">Bozza</div>
+                                                }
+                                            </td>
+                                            <td>
+                                                <div class="flex items-center space-x-2">
+                                                    <a href="@Url.Action("Dettagli", new { id = immobile.ImmobileId })"
+                                                       class="btn btn-sm btn-outline btn-info" title="Visualizza dettagli">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                    <a href="@Url.Action("Modifica", new { id = immobile.ImmobileId })"
+                                                       class="btn btn-sm btn-outline btn-warning" title="Modifica">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <button class="btn btn-sm btn-outline @(immobile.IsPublished ? "btn-secondary" : "btn-success")"
+                                                            onclick="togglePublished('@immobile.ImmobileId', @immobile.IsPublished.ToString().ToLower())"
+                                                            title="@(immobile.IsPublished ? "Nascondi" : "Pubblica")">
+                                                        <i class="fas @(immobile.IsPublished ? "fa-eye-slash" : "fa-eye")"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-outline btn-error"
+                                                            onclick="eliminaImmobile('@immobile.ImmobileId', '@immobile.Titolo')"
+                                                            title="Elimina immobile">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="text-center py-12">
+                        <i class="fas fa-home text-4xl text-base-content/30 mb-4"></i>
+                        <h3 class="text-lg font-bold mb-2">Nessun immobile ancora</h3>
+                        <p class="text-base-content/70 mb-6">Inizia aggiungendo il tuo primo immobile all'agenzia</p>
+                        <a asp-action="Aggiungi" class="btn btn-astami-orange">
+                            <i class="fas fa-plus mr-2"></i>
+                            Aggiungi Immobile
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // View toggle functionality
+    document.getElementById('gridViewBtn').addEventListener('click', function() {
+        document.getElementById('gridView').classList.remove('hidden');
+        document.getElementById('listView').classList.add('hidden');
+        this.classList.add('btn-active');
+        document.getElementById('listViewBtn').classList.remove('btn-active');
+    });
+
+    document.getElementById('listViewBtn').addEventListener('click', function() {
+        document.getElementById('listView').classList.remove('hidden');
+        document.getElementById('gridView').classList.add('hidden');
+        this.classList.add('btn-active');
+        document.getElementById('gridViewBtn').classList.remove('btn-active');
+    });
+
+    // Search functionality
+    document.getElementById('searchInput').addEventListener('input', function() {
+        filterImmobili();
+    });
+
+    document.getElementById('contractFilter').addEventListener('change', function() {
+        filterImmobili();
+    });
+
+    document.getElementById('statusFilter').addEventListener('change', function() {
+        filterImmobili();
+    });
+
+    document.getElementById('sortFilter').addEventListener('change', function() {
+        sortImmobili();
+    });
+
+    function filterImmobili() {
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+        const contractFilter = document.getElementById('contractFilter').value;
+        const statusFilter = document.getElementById('statusFilter').value;
+
+        const cards = document.querySelectorAll('.immobile-card');
+        const rows = document.querySelectorAll('.immobile-row');
+
+        // Filter cards (grid view)
+        cards.forEach(card => {
+            const title = card.dataset.title;
+            const city = card.dataset.city;
+            const address = card.dataset.address;
+            const contract = card.dataset.contract;
+            const published = card.dataset.published;
+
+            let showCard = true;
+
+            // Text search
+            if (searchTerm && !title.includes(searchTerm) && !city.includes(searchTerm) && !address.includes(searchTerm)) {
+                showCard = false;
+            }
+
+            // Contract filter
+            if (contractFilter && contract !== contractFilter) {
+                showCard = false;
+            }
+
+            // Status filter
+            if (statusFilter) {
+                if (statusFilter === 'published' && published !== 'true') {
+                    showCard = false;
+                }
+                if (statusFilter === 'draft' && published !== 'false') {
+                    showCard = false;
+                }
+            }
+
+            card.style.display = showCard ? '' : 'none';
+        });
+
+        // Filter rows (list view)
+        rows.forEach(row => {
+            const title = row.dataset.title;
+            const city = row.dataset.city;
+            const address = row.dataset.address;
+            const contract = row.dataset.contract;
+            const published = row.dataset.published;
+
+            let showRow = true;
+
+            // Text search
+            if (searchTerm && !title.includes(searchTerm) && !city.includes(searchTerm) && !address.includes(searchTerm)) {
+                showRow = false;
+            }
+
+            // Contract filter
+            if (contractFilter && contract !== contractFilter) {
+                showRow = false;
+            }
+
+            // Status filter
+            if (statusFilter) {
+                if (statusFilter === 'published' && published !== 'true') {
+                    showRow = false;
+                }
+                if (statusFilter === 'draft' && published !== 'false') {
+                    showRow = false;
+                }
+            }
+
+            row.style.display = showRow ? '' : 'none';
+        });
+    }
+
+    function sortImmobili() {
+        const sortBy = document.getElementById('sortFilter').value;
+        const gridContainer = document.getElementById('gridView');
+        const listContainer = document.querySelector('#listView tbody');
+
+        // Sort cards
+        const cards = Array.from(document.querySelectorAll('.immobile-card'));
+        const rows = Array.from(document.querySelectorAll('.immobile-row'));
+
+        cards.sort((a, b) => {
+            switch (sortBy) {
+                case 'newest':
+                    return parseInt(b.dataset.date) - parseInt(a.dataset.date);
+                case 'oldest':
+                    return parseInt(a.dataset.date) - parseInt(b.dataset.date);
+                case 'price-asc':
+                    return parseFloat(a.dataset.price) - parseFloat(b.dataset.price);
+                case 'price-desc':
+                    return parseFloat(b.dataset.price) - parseFloat(a.dataset.price);
+                default:
+                    return 0;
+            }
+        });
+
+        rows.sort((a, b) => {
+            switch (sortBy) {
+                case 'newest':
+                    return parseInt(b.dataset.date) - parseInt(a.dataset.date);
+                case 'oldest':
+                    return parseInt(a.dataset.date) - parseInt(b.dataset.date);
+                case 'price-asc':
+                    return parseFloat(a.dataset.price) - parseFloat(b.dataset.price);
+                case 'price-desc':
+                    return parseFloat(b.dataset.price) - parseFloat(a.dataset.price);
+                default:
+                    return 0;
+            }
+        });
+
+        // Re-append sorted elements
+        cards.forEach(card => gridContainer.appendChild(card));
+        rows.forEach(row => listContainer.appendChild(row));
+    }
+
+    // Toggle published status
+    function togglePublished(immobileId, currentStatus) {
+        const newStatus = !currentStatus;
+        const action = newStatus ? 'pubblicare' : 'nascondere';
+
+        Swal.fire({
+            title: `${action.charAt(0).toUpperCase() + action.slice(1)} immobile?`,
+            text: `Sei sicuro di voler ${action} questo immobile?`,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#6c757d',
+            confirmButtonText: `Sì, ${action}`,
+            cancelButtonText: 'Annulla',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: 'Aggiornamento in corso...',
+                    text: 'Attendere prego',
+                    icon: 'info',
+                    allowOutsideClick: false,
+                    showConfirmButton: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                fetch('@Url.Action("CambiaStato")', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                    },
+                    body: `immobileId=${immobileId}&isPublished=${newStatus}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            title: 'Stato aggiornato!',
+                            text: data.message,
+                            icon: 'success',
+                            timer: 2000,
+                            showConfirmButton: false
+                        }).then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Errore!',
+                            text: data.message,
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                })
+                .catch(error => {
+                    Swal.fire({
+                        title: 'Errore di connessione!',
+                        text: 'Si è verificato un errore durante l\'aggiornamento',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                });
+            }
+        });
+    }
+
+    // Elimina immobile
+    function eliminaImmobile(immobileId, titolo) {
+        Swal.fire({
+            title: 'Eliminare immobile?',
+            text: `Sei sicuro di voler eliminare "${titolo}"? Questa azione non può essere annullata.`,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Sì, elimina',
+            cancelButtonText: 'Annulla',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    title: 'Eliminazione in corso...',
+                    text: 'Attendere prego',
+                    icon: 'info',
+                    allowOutsideClick: false,
+                    showConfirmButton: false,
+                    didOpen: () => {
+                        Swal.showLoading();
+                    }
+                });
+
+                fetch('@Url.Action("Elimina")', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                    },
+                    body: `immobileId=${immobileId}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            title: 'Eliminato!',
+                            text: data.message,
+                            icon: 'success',
+                            timer: 2000,
+                            showConfirmButton: false
+                        }).then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Errore!',
+                            text: data.message,
+                            icon: 'error',
+                            confirmButtonText: 'OK'
+                        });
+                    }
+                })
+                .catch(error => {
+                    Swal.fire({
+                        title: 'Errore di connessione!',
+                        text: 'Si è verificato un errore durante l\'eliminazione',
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                });
+            }
+        });
+    }
+
+    // Gestisci messaggi TempData
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <text>
+                Swal.fire({
+                    title: 'Successo!',
+                    text: '@TempData["SuccessMessage"]',
+                    icon: 'success',
+                    timer: 3000,
+                    showConfirmButton: false,
+                    toast: true,
+                    position: 'top-end'
+                });
+        </text>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <text>
+                Swal.fire({
+                    title: 'Errore!',
+                    text: '@TempData["ErrorMessage"]',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+        </text>
+    }
+</script>
+
+@* Token per CSRF *@
+@Html.AntiForgeryToken()
